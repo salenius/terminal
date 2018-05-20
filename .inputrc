@@ -1,0 +1,9 @@
+#########################
+# Inputrc-tiedosto
+# Author: Tommi Salenius
+# License: GPL (2018)
+# ######################
+
+# Aseta Vi-pikanäppäiset terminaaliin
+set editing-mode vi
+set keymap vi-command
