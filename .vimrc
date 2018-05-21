@@ -14,6 +14,9 @@ set autoindent
 filetype indent plugin on
 set splitright
 
+" Tee värimaailmasta kivempi (kommentit turkoosilla tummansinisen sijaan)
+color desert
+
 " Näppäinlyhenteet seuraavasti: Ctrl = C, Alt = M, Shift = S
 nmap § $
 
