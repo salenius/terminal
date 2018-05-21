@@ -17,3 +17,4 @@ nnoremap cc 0i#<esc>
 nnoremap ;func <-<space>function(#arg){<enter>#%%<enter>}<esc>?#arg<enter>ce
 inoremap ;varmalli vars::VAR()<esc>i
 inoremap ;mat matrix(c(args),<space>nrow=#%%,<space>ncol=#%%,<space>byrow=#%%)
+inoremap ;pr print()<esc>i

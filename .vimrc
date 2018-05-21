@@ -23,6 +23,10 @@ nmap § $
 " Näppäinoikotie escille
 inoremap åå <esc>
 
+" Hyppää pois eri sulkumerkkien sisältä
+" Toimii toistaiseksi vain ()
+inoremap <S><S> <esc>/)<Cr>a
+
 " map CTRL-E to end-of-line (insert mode)
 map <C-e> <esc>$i<right>
 imap <F7> <esc>:w<Enter>i
