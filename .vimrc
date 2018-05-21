@@ -20,6 +20,9 @@ color desert
 " Näppäinlyhenteet seuraavasti: Ctrl = C, Alt = M, Shift = S
 nmap § $
 
+" Näppäinoikotie escille
+inoremap åå <esc>
+
 " map CTRL-E to end-of-line (insert mode)
 map <C-e> <esc>$i<right>
 imap <F7> <esc>:w<Enter>i
