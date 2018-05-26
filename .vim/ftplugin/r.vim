@@ -5,6 +5,7 @@
 
 nnoremap ;env :read<space>/users/tommi/.vim/templates/R-template<enter>ggdd<S-g><S-e>a<enter><esc>
 inoremap ;. $
+inoremap å<Space> <-
 inoremap ;tilde ~ 
 nnoremap <F5> :!Rscript %<Enter>
 nnoremap <F6> :!clear ; Rscript %<Enter>

@@ -1,3 +1,8 @@
+""" Pythonrc
+""" Tommi Salenius
+""" tommisalenius@gmail.com
+""" General Public License (2018)
+
 " Python specific settings.
 setlocal tabstop=4
 setlocal shiftwidth=4
@@ -6,6 +11,7 @@ setlocal autoindent
 setlocal formatoptions=croql
 nmap <F5> :!clear;<space>python<space>%<CR>
 nmap <F6> :!python<space>%<Cr>
+set foldmethod=indent
 
 " set foldmethod=indent
 let python_highlight_all=1

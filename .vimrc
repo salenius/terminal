@@ -14,14 +14,35 @@ set autoindent
 filetype indent plugin on
 set splitright
 
+" Tallenna ja lataa automaattisesti foldatut (=peitetyt)
+" tekstit tiedoston suljettaessa ja avatessa
+au BufWinLeave * mkview
+au BufWinEnter * silent loadview
+
 " Tee värimaailmasta kivempi (kommentit turkoosilla tummansinisen sijaan)
 color desert
 
-" Näppäinlyhenteet seuraavasti: Ctrl = C, Alt = M, Shift = S
+" Näppäinlyhenteet seuraavasti: Ctrl = C, Alt = M, Shift = S, Enter = Cr
 nmap § $
 
+" Pikanäppäimet poistumiselle tiedostosta.
+" ä = älä tallena
+" ö = tallenna
+nnoremap ää :q!
+nnoremap öö :wq
+nnoremap åå :wq<Cr>
 " Näppäinoikotie escille
 inoremap åå <esc>
+vnoremap åå <esc> 
+
+" Hae tekstin sisällä
+inoremap åf <Esc>/
+inoremap åF <Esc>?
+inoremap åv <Esc>v
+inoremap åe <C-r>=
+inoremap åh <Esc>:help<space>
+nnoremap åh :help<space>
+nnoremap åh :help<space>
 
 " Hyppää pois eri sulkumerkkien sisältä
 " Toimii toistaiseksi vain ()
