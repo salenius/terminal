@@ -14,6 +14,74 @@ set autoindent
 filetype indent plugin on
 set splitright
 
+""" Vimbleä varten, Vimble on pluginien hallintatyökalu
+set nocompatible 
+filetype off
+
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+
+" let Vundle manage Vundle, required
+Plugin 'VundleVim/Vundle.vim'
+"""
+Plugin 'mattn/emmet-vim'
+Plugin 'nerdtree'
+"Plugin 'syntastic'
+Plugin 'w0rp/ale'
+""" Tuet eri kielille
+Plugin 'bib.vim'
+Plugin 'c.vim'
+Plugin 'cpp.vim'
+Plugin 'css.vim'
+Plugin 'go.vim'
+Plugin 'html.vim'
+Plugin 'java.vim'
+Plugin 'javascript.vim'
+Plugin 'json.vim'
+Plugin 'markdown.vim'
+Plugin 'matlab.vim'
+Plugin 'plaintex.vim'
+Plugin 'python.vim'
+Plugin 'r.vim'
+Plugin 'sql.vim'
+Plugin 'tex.vim'
+Plugin 'updatedb.vim'
+" Erillinen tuki R:lle
+" Vaatii tmux-terminaalin, joka ei ole toistaiseksi käytössä
+"Plugin 'jalvesaq/Nvim-R'
+
+call vundle#end()            " required
+filetype plugin indent on 
+
+" Avaa NerdTree. Älä automatisoi tätä koska dot-tiedostojen kanssa tulee
+" ongelmia
+nnoremap öö :NERDTree<Cr>
+nnoremap öc :NERDTreeClose<Cr>
+nnoremap öb :NERDTreeFromBookmark<Space>
+
+" Liiku ikkunoiden välillä
+nnoremap åw :wincmd l<Cr>
+nnoremap öh :wincmd h<Cr>
+nnoremap öl :wincmd l<Cr>
+
+" Emmet-pikanäppäinten hyödynnys
+" Ts. kun haluat laajentaa lyhenteitä, niin paina å ja ,
+let g:user_emmet_leader_key='å'
+
+" Suositellut asetukset syntasticsille, eli linterille
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+let g:ale_linters = {'c': ['cpplint'], 'cpp': ['cpplint'], 'python': ['pylint'],'r': ['lintr']}
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+
+" Alen asetukset
+let g:ale_sign_error = '>>'
+let g:ale_sign_warning = '--'
+
 " Tallenna ja lataa automaattisesti foldatut (=peitetyt)
 " tekstit tiedoston suljettaessa ja avatessa
 au BufWinLeave * mkview
@@ -25,11 +93,13 @@ color desert
 " Näppäinlyhenteet seuraavasti: Ctrl = C, Alt = M, Shift = S, Enter = Cr
 nmap § $
 
+" Aja makroja helpommin
+nnoremap ä @
+
 " Pikanäppäimet poistumiselle tiedostosta.
 " ä = älä tallena
 " ö = tallenna
 nnoremap ää :q!
-nnoremap öö :wq
 nnoremap åå :wq<Cr>
 " Näppäinoikotie escille
 inoremap åå <esc>
