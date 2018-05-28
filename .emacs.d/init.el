@@ -41,6 +41,8 @@
 (define-key evil-normal-state-map "ås" 'save-buffer) ; Tallena tiedosto
 (define-key evil-normal-state-map "§" 'end-of-line) ; Mene rivin loppuun
 (define-key evil-normal-state-map "ää" 'evil-execute-macro) ; Aja makro
+(define-key evil-normal-state-map "öi" (lambda () (interactive)(find-file "/Users/tommi/.emacs.d/init.el")))
+(define-key evil-normal-state-map "öb" 'buffer-menu)
 ;; (define-key evil-normal-state-map "" ')
 
 
@@ -55,7 +57,7 @@
     ("3d5720f488f2ed54dd4e40e9252da2912110948366a16aef503f3e9e7dfe4915" "a4df5d4a4c343b2712a8ed16bc1488807cd71b25e3108e648d4a26b02bc990b3" default)))
  '(package-selected-packages
    (quote
-    (ess ace-window darcula-theme geeknote dracula-theme google-maps evil))))
+    (yasnippet matlab-mode ess ace-window darcula-theme geeknote dracula-theme google-maps evil))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
