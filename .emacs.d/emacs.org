@@ -1,0 +1,371 @@
+#+STARTUP: overview
+# Emacs-konfiguraatio tiedosto
+# Author: Tommi Salenius
+# Created: La 9.6.2018
+# License: GPL (2018)
+# ---
+Tämän tiedoston tarkoituksena on auttaa pitämään Emacs-kustomoinnit
+hyvin organisoituna. Ideana on, että ohjelman käynnistyessä ajettava
+[[file:/Users/tommi/.emacs.d/init.el][init.el-tiedosto]] ajaa läpi komennon, joka parsii tässä tiedostossa olevat
+Elisp-komennot ja ajaa ne sitten Lisp-tulkin läpi asiaankuuluvin seurauksin.
+
+* Yleiset asetukset  
+** Kieli
+Aseta kieli siten, että oletuksenomaisesti UTF-8-merkintätapa pätee.
+
+#+BEGIN_SRC emacs-lisp
+
+(set-language-environment "UTF-8")
+(set-default-coding-systems 'utf-8)
+
+#+END_SRC 
+** Työkalurivi ja valikkorivi
+Piilota työkalurivi oletusarvoisesti. Valikkoriviä ei tarvitse piilottaa, koska
+Macissa se on sijoitettuna automaattisesti ikkunan yläpuolella sijaitsevaan
+palkkiin jota ei voi poistaa.
+
+#+BEGIN_SRC emacs-lisp
+
+(tool-bar-mode -1)
+
+#+END_SRC 
+** Kursori
+Aseta kursorin väri fiksummaksi kuin oletusarvo. Voit vaihtaa värin
+laittamalla heksadesimaalisen värikoodin muodossa _hxväri_, jossa väri
+voi olla mikä tahansa kuten punainen, limenvihreä jne; abbrev-mode
+korjaa tämän jälkeen värin heksadesimaalinumeroksi
+
+#+BEGIN_SRC emacs-lisp
+
+(set-cursor-color "#c8a2c8")
+
+#+END_SRC 
+** Aloitusbuffer
+Aseta oletusarvoisesti niin, että Emacsin default-aloitusbufferi
+ei pomppaa kuvaan kun ohjelma avataan. Sen sijaan scratch-bufferi toimii
+avausikkunana.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq inhibit-startup-screen t)
+
+#+END_SRC 
+** Meta + X -substituutti
+Alt + x -yhdistelmä on ergonomisesti aivan karsea. Tee näppäinyhdistelmä, jossa
+voidaan saada helpommin menu / valikko / funktiovalikko käyttöön.
+
+#+BEGIN_SRC emacs-lisp
+
+(define-key key-translation-map (kbd "åe") (kbd "<menu>"))
+
+#+END_SRC 
+
+** Rivinumerot
+Emacsissa ei ole oletuksena rivinumeroita. Tämän avulla ne näkyvät.
+
+#+BEGIN_SRC emacs-lisp
+
+(global-linum-mode t)
+
+#+END_SRC 
+
+** Varmuuskopiot / backupit
+Oletusarvoisesti kaikki backup-tiedostot menevät samaan kansioon kuin alkuperäis-
+tiedostotkin. Luo kaikille tiedostoille yhtenäinen backup-kansio tilanteen helpottamiseksi.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq backup-directory-alist '(("." . "/Users/tommi/.emacs.d/backup")))
+
+#+END_SRC 
+
+** Merkkiääni
+Hiljennä editoreissa tyypillisesti oleva merkkiääni, joka soi esim. kun kursori
+on jo rivin alussa/lopussa ja yrittää siirtyä siitä eteenpäin.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq ring-bell-function 'ignore)
+
+#+END_SRC 
+
+** Terminaali / shell
+Aseta oletusarvoisesti zsh terminaaliksi, joka avataan kun käsky annetaan.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq explicit-shell-file-name "/bin/zsh")
+
+#+END_SRC 
+
+** Teema
+Valitse teematiedosto, jota haluat käyttää. 
+
+#+BEGIN_SRC emacs-lisp
+
+(load-theme 'misterioso)
+
+#+END_SRC 
+
+* Evil-mode
+** Normal-mode
+*** Tiedoston sisällä liikkuminen
+Seuraavat näppäinoikotiet on tarkoitettu helpottamaan liikkumista saman
+bufferin ja ikkunan sisällä.
+
+#+BEGIN_SRC emacs-lisp
+
+(define-key evil-normal-state-map "åf" 'search-forward)
+(define-key evil-normal-state-map "§" 'end-of-line) ; Mene rivin loppuun
+(define-key evil-normal-state-map "zj" 'evil-scroll-down)
+(define-key evil-normal-state-map "zk" 'evil-scroll-up)
+
+
+#+END_SRC 
+
+*** Ikkunat
+Hallitse ikkunoita ja liiku niiden välillä
+
+#+BEGIN_SRC emacs-lisp
+
+(define-key evil-normal-state-map "öö" 'ace-window) ; Mahdollista liikkuminen ikkunoiden välillä
+(define-key evil-normal-state-map "öwh" 'split-window-horizontally)
+(define-key evil-normal-state-map "öwv" 'split-window-vertically)
+(define-key evil-normal-state-map (kbd "C-ä") 'evil-window-next)
+(define-key evil-normal-state-map "ökt" 'delete-window)
+(define-key evil-normal-state-map "öka" 'delete-other-windows)
+
+#+END_SRC 
+
+*** Bufferit
+Hallitse buffereita ja liiku niiden välillä
+
+#+BEGIN_SRC emacs-lisp
+
+(define-key evil-normal-state-map "ås" 'save-buffer) ; Tallena tiedosto
+(define-key evil-normal-state-map "öb" 'buffer-menu)
+(define-key evil-normal-state-map "öä" 'kill-this-buffer)
+(define-key evil-normal-state-map (kbd "C-j") 'evil-next-buffer)
+(define-key evil-normal-state-map (kbd "C-k") 'evil-prev-buffer)
+
+#+END_SRC 
+ 
+*** Makrot
+Käytä tätä komentoa makron ajamiseen.
+
+#+BEGIN_SRC emacs-lisp
+
+(define-key evil-normal-state-map "ää" 'evil-execute-macro) ; Aja makro
+
+#+END_SRC 
+
+*** Tiedostojen hakeminen
+Näillä komennoilla voidaan hakea tiedostoja joko yleisessä merkityksessä, tai
+sitten jotain tiettyjä usein haettavia tiedostoja, jotka tarvitsevat itsessään
+oman näppäinoikotien.
+
+#+BEGIN_SRC emacs-lisp
+
+(define-key evil-normal-state-map "åg" 'find-file) ; Etsi tiedosto
+(define-key evil-normal-state-map "öi" (lambda () (interactive)(find-file "/Users/tommi/.emacs.d/init.el")))
+
+#+END_SRC 
+
+*** Tekstin muokkaus
+Näillä komennoilla voi tehdä muokkauksia tekstiin ilman, että tarvitsee
+siirtyä Insert-modeen
+
+#+BEGIN_SRC emacs-lisp
+
+(define-key evil-normal-state-map (kbd "C-ö") 'comment-line) ; Kommentoi tai unkommentoi rivi
+
+#+END_SRC 
+
+*** Yas-snippets
+Luo uusia Yas-snippettejä, jotka ovat moodispesifejä
+
+#+BEGIN_SRC emacs-lisp
+
+(define-key evil-normal-state-map "åns" 'yas-new-snippet) ; Luo uusi snippetti, joka on asiaankuuluvassa moodissa
+
+#+END_SRC 
+
+*** Help ja terminaali
+Käytä näitä komentoja kun tarvtiset apua jossain tilanteessa.
+
+#+BEGIN_SRC emacs-lisp
+
+(define-key evil-normal-state-map "åk" 'describe-key) ; Tutki äkkiä jonkun näppäinyhdistelmän merkitys 
+(define-key evil-normal-state-map "åc" 'shell-command)
+
+#+END_SRC 
+
+*** Oikoluku / abbrev
+Käytä näitä komentoja luodaksesi lennosta uusia abbrev-taulukon alkioita, 
+jotka abbrev-mode oikolukee lennosta.
+
+#+BEGIN_SRC emacs-lisp
+
+(define-key evil-normal-state-map "åag" 'add-global-abbrev)
+(define-key evil-normal-state-map "åam" 'add-mode-abbrev)
+(define-key evil-normal-state-map "åaig" 'inverse-add-global-abbrev)
+(define-key evil-normal-state-map "åaim" 'inverse-add-mode-abbrev)
+
+#+END_SRC 
+ 
+** Insert-mode
+*** Erikoismerkit
+Erikoismerkeiksi lasketaan kaikki merkit tyyliin @, $, \ jne. Tämä osio sisältää
+näppäinyhdistelmät joilla ne voi tehdä käyttäjän ollessa Insert-modessa.
+
+#+BEGIN_SRC emacs-lisp
+
+(define-key evil-insert-state-map "åå" 'evil-force-normal-state) ; Poistu insert-modesta normal-modeen
+(define-key evil-insert-state-map "å." (lambda() (interactive)(insert "å"))) ; Lisää ruotsalainen o normaalisti
+(define-key evil-insert-state-map "å2" (lambda() (interactive)(insert "@"))) ; Tee at-merkki / at-sign
+(define-key evil-insert-state-map "å4" (lambda() (interactive)(insert "$")))
+(define-key evil-insert-state-map "å7" (lambda() (interactive)(insert "\\"))) ; Tee yksi (1) vasemmalle kallistuva kauttaviiva
+(define-key evil-insert-state-map "å8" (lambda() (interactive)(insert "[]")))
+(define-key evil-insert-state-map "å9" (lambda() (interactive)(insert "{}")))
+(define-key evil-insert-state-map (kbd "C-ä") 'evil-window-next)
+(define-key evil-insert-state-map (kbd "C-d") 'kill-word)
+(define-key evil-insert-state-map (kbd "C-ö") 'evil-normal-state)
+(define-key evil-insert-state-map (kbd "å<") (lambda() (interactive)(insert "|")))
+(define-key evil-insert-state-map "ås" 'save-buffer)
+(define-key evil-insert-state-map "åc" 'shell-command)
+(define-key evil-insert-state-map (kbd "C-n") 'uusi-rivi)
+(define-key evil-insert-state-map (kbd "C-k") 'evil-delete-backward-char)
+(define-key evil-insert-state-map (kbd "C-b") 'hakasulkeet)
+
+#+END_SRC 
+
+** Visual-mode
+
+* Org-mode
+** Bulletpoints
+Tämän käyttäminen tekee listaamiseen tarkoitetuista bulletpointeista
+kauniimman näköisiä.
+
+#+BEGIN_SRC emacs-lisp
+
+(require 'org-bullets)
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+
+#+END_SRC
+
+** Syntax highlighting
+Ilman tätä org-tiedoston koodiblokeissa ei olisi koodin omaa
+highlightausta.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq org-src-fontify-natively t)
+
+#+END_SRC 
+
+* Python
+** Hookit
+Aseta hookeja, jotka aktivoituvat samalla kun Python-tila aktivoituu.
+
+#+BEGIN_SRC emacs-lisp
+
+(require 'auto-virtualenv)
+(add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
+(add-hook 'projectile-after-switch-project-hook 'auto-virtualenv-set-virtualenv)
+
+#+END_SRC 
+
+** Indentointi
+Aseta lähtökohtaisesti toimimaan
+
+#+BEGIN_SRC emacs-lisp
+
+(setq py-smart-indentation t)
+
+#+END_SRC 
+
+** Elpy
+Aseta Elpy toimimaan
+
+#+BEGIN_SRC emacs-lisp
+
+(elpy-enable)
+(setq elpy-rpc-backend "/Applications/anaconda3/lib/python3.6/site-packages/")
+(setq elpy-rpc-python-command "/Users/tommi/.emacs.d/.python-environments/default/bin/python3.6")
+;;(add-hook 'python-mode-hook 'jedi:ac-setup)
+(setq jedi:complete-on-dot t)
+
+#+END_SRC 
+
+** Terminaali ja tulkki
+Tulkki on tällä hetkellä Jupyter-notebook, mutta tästä tulisi mahdollisesti päästä
+eroon.
+
+#+BEGIN_SRC emacs-lisp
+
+(pyenv-mode)
+(setq python-shell-interpreter "/Applications/anaconda3/bin/jupyter")
+;;    python-shell-interpreter-args "console")
+(setq-default py-which-bufname "IPython")
+
+#+END_SRC 
+
+* Omat funktiot
+** Uudellennimeä buffer ja tiedosto
+Credit to Steve Yegge. Tälle pitäisi keksiä jokin näppäinyhdistelmä.
+
+#+BEGIN_SRC emacs-lisp
+
+(defun rename-file-and-buffer (new-name)
+ "Renames both current buffer and file it's visiting to NEW-NAME." (interactive "sNew name: ")
+ (let ((name (buffer-name))
+	(filename (buffer-file-name)))
+ (if (not filename)
+	(message "Buffer '%s' is not visiting a file!" name)
+ (if (get-buffer new-name)
+	 (message "A buffer named '%s' already exists!" new-name)
+	(progn 	 (rename-file filename new-name 1) 	 (rename-buffer new-name) 	 (set-visited-file-name new-name) 	 (set-buffer-modified-p nil)))))) ;;
+;
+
+#+END_SRC 
+** Työn alla
+#+BEGIN_SRC emacs-lisp
+
+;; Tässä funktiossa on jokin pielessä, minkä vuoksi sitä ei käytetä.
+;;(defun move-buffer-file (dir)
+;; "Moves both current buffer and file it's visiting to DIR." (interactive "DNew directory: ")
+;; (let* ((name (buffer-name))
+;;	 (filename (buffer-file-name))
+;;	 (dir
+;;	 (if (string-match dir "\\(?:/\\|\\\\)$")
+;;	 (substring dir 0 -1) dir))
+;;	 (newname (concat dir "/" name)))
+
+; (defun evil-normaali ()
+ ;   "Toimii kuten evil-normal-state, mutta järjestää asian niin, että kursori ei liiku vasemmalle siirryttäessä edestakaisin normal- ja insert-moden välillä."
+ ;; (evil-normal-state)(evil-forward-char))
+
+
+#+END_SRC 
+
+* Popup
+** Perusasetukset
+En ole saanut tätä skulaamaan vielä ollenkaan. Ota projektiksi.
+
+#+BEGIN_SRC emacs-lisp
+
+(require 'popup)
+(define-key popup-menu-keymap (kbd "TAB") 'popup-next)
+(provide 'popup-complete)
+
+#+END_SRC 
+
+* Leikkikenttä
+Laita tänne kaikkea höpsöttelyä.
+
+#+BEGIN_SRC emacs-lisp
+(message "Heihou")
+#+END_SRC 
+
+
+

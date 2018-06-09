@@ -73,6 +73,7 @@ echo "Kääntäminen onnistui" ;
 echo "-----------------------"
 }
 
+
 # Luo automaattisesti Python-ympäristöjä
 
 condaenv(){

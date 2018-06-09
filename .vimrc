@@ -14,7 +14,7 @@ set autoindent
 filetype indent plugin on
 set splitright
 
-""" VimbleÃ¤ varten, Vimble on pluginien hallintatyÃ¶kalu
+""" Vimbleä varten, Vimble on pluginien hallintatyökalu
 set nocompatible 
 filetype off
 
@@ -47,26 +47,26 @@ Plugin 'sql.vim'
 Plugin 'tex.vim'
 Plugin 'updatedb.vim'
 " Erillinen tuki R:lle
-" Vaatii tmux-terminaalin, joka ei ole toistaiseksi kÃ¤ytÃ¶ssÃ¤
+" Vaatii tmux-terminaalin, joka ei ole toistaiseksi käytössä
 "Plugin 'jalvesaq/Nvim-R'
 
 call vundle#end()            " required
 filetype plugin indent on 
 
-" Avaa NerdTree. Ã„lÃ¤ automatisoi tÃ¤tÃ¤ koska dot-tiedostojen kanssa tulee
+" Avaa NerdTree. Älä automatisoi tätä koska dot-tiedostojen kanssa tulee
 " ongelmia
-nnoremap Ã¶Ã¶ :NERDTree<Cr>
-nnoremap Ã¶c :NERDTreeClose<Cr>
-nnoremap Ã¶b :NERDTreeFromBookmark<Space>
+nnoremap öö :NERDTree<Cr>
+nnoremap öc :NERDTreeClose<Cr>
+nnoremap öb :NERDTreeFromBookmark<Space>
 
-" Liiku ikkunoiden vÃ¤lillÃ¤
-nnoremap Ã¥w :wincmd l<Cr>
-nnoremap Ã¶h :wincmd h<Cr>
-nnoremap Ã¶l :wincmd l<Cr>
+" Liiku ikkunoiden välillä
+nnoremap åw :wincmd l<Cr>
+nnoremap öh :wincmd h<Cr>
+nnoremap öl :wincmd l<Cr>
 
-" Emmet-pikanÃ¤ppÃ¤inten hyÃ¶dynnys
-" Ts. kun haluat laajentaa lyhenteitÃ¤, niin paina Ã¥ ja ,
-let g:user_emmet_leader_key='Ã¥'
+" Emmet-pikanäppäinten hyödynnys
+" Ts. kun haluat laajentaa lyhenteitä, niin paina å ja ,
+let g:user_emmet_leader_key='å'
 
 " Suositellut asetukset syntasticsille, eli linterille
 set statusline+=%#warningmsg#
@@ -87,34 +87,34 @@ let g:ale_sign_warning = '--'
 au BufWinLeave * mkview
 au BufWinEnter * silent loadview
 
-" Tee vÃ¤rimaailmasta kivempi (kommentit turkoosilla tummansinisen sijaan)
+" Tee värimaailmasta kivempi (kommentit turkoosilla tummansinisen sijaan)
 color desert
 
-" NÃ¤ppÃ¤inlyhenteet seuraavasti: Ctrl = C, Alt = M, Shift = S, Enter = Cr
-nmap Â§ $
+" Näppäinlyhenteet seuraavasti: Ctrl = C, Alt = M, Shift = S, Enter = Cr
+nmap § $
 
 " Aja makroja helpommin
-nnoremap Ã¤ @
+nnoremap ä @
 
-" PikanÃ¤ppÃ¤imet poistumiselle tiedostosta.
-" Ã¤ = Ã¤lÃ¤ tallena
-" Ã¶ = tallenna
-nnoremap Ã¤Ã¤ :q!
-nnoremap Ã¥Ã¥ :wq<Cr>
-" NÃ¤ppÃ¤inoikotie escille
-inoremap Ã¥Ã¥ <esc>
-vnoremap Ã¥Ã¥ <esc> 
+" Pikanäppäimet poistumiselle tiedostosta.
+" ä = älä tallena
+" ö = tallenna
+nnoremap ää :q!
+nnoremap åå :wq<Cr>
+" Näppäinoikotie escille
+inoremap åå <esc>
+vnoremap åå <esc> 
 
-" Hae tekstin sisÃ¤llÃ¤
-inoremap Ã¥f <Esc>/
-inoremap Ã¥F <Esc>?
-inoremap Ã¥v <Esc>v
-inoremap Ã¥e <C-r>=
-inoremap Ã¥h <Esc>:help<space>
-nnoremap Ã¥h :help<space>
-nnoremap Ã¥h :help<space>
+" Hae tekstin sisällä
+inoremap åf <Esc>/
+inoremap åF <Esc>?
+inoremap åv <Esc>v
+inoremap åe <C-r>=
+inoremap åh <Esc>:help<space>
+nnoremap åh :help<space>
+nnoremap åh :help<space>
 
-" HyppÃ¤Ã¤ pois eri sulkumerkkien sisÃ¤ltÃ¤
+" Hyppää pois eri sulkumerkkien sisältä
 " Toimii toistaiseksi vain ()
 inoremap <S><S> <esc>/)<Cr>a
 
@@ -125,14 +125,14 @@ imap <F7> <esc>:w<Enter>i
 " Kirjoita nopeasti funktiokomento insert-tilassa
 imap <C-r> <C-r>=
 
-" Liiku helposti seuraavaan tabiin/vÃ¤lilehteen
+" Liiku helposti seuraavaan tabiin/välilehteen
 map <S-tab> <esc>gt
 nmap <tab> gt
 
 " Uusi rivi helposti
 nmap <C-n> <S-e>a<Enter><esc> 
 
-" SÃ¤Ã¤dÃ¤ oletuksena, ettÃ¤ tex-tiedostot omat LaTeX-tiedostoja (ei plaintex)
+" Säädä oletuksena, että tex-tiedostot omat LaTeX-tiedostoja (ei plaintex)
 let g:tex_flavor = "latex"
 
 " Markdown-automatisointi
@@ -159,25 +159,25 @@ function Kansio()
 		return expand('%:p:h:t') 
 endfunction
 
-" TÃ¤hÃ¤n customoidut filetypet
-" " KÃ¤ytÃ¤ tÃ¤tÃ¤ duunimuistiinpanojen kanssa
+" Tähän customoidut filetypet
+" " Käytä tätä duunimuistiinpanojen kanssa
 au BufNewFile,BufRead *.bof set filetype=bof
 
 " Bof-komennot
-autocmd FileType bof nnoremap ;env i#<space>BoF-muistiinpano,<space>salassapidettÃ¤vÃ¤
+autocmd FileType bof nnoremap ;env i#<space>BoF-muistiinpano,<space>salassapidettävä
 autocmd FileType bof nnoremap <space><space> $a<enter><esc> 
 autocmd FileType bof nnoremap ;line $a<enter>-------------------------<enter><esc>
 
 " Bib tex
-autocmd FileType bib inoremap Â§aer American<space>Economic<space>Review
-autocmd FileType bib inoremap Â§jme Journal<space>of<space>Monetary<space>Economics
-autocmd FileType bib inoremap Â§res Review<space>of<space>Economic<space>Studies
-autocmd FileType bib inoremap Â§eco Econometrica
-autocmd FileType bib inoremap Â§jpe Journal<space>of<space>Political<space>Economy
-autocmd FileType bib inoremap Â§aej American<space>Economic<space>Journal
-autocmd FileType bib inoremap Â§mac Macroeconomics
-autocmd FileType bib inoremap Â§kak Kansantaloudellinen<space>Aikakauskirja
-autocmd FileType bib inoremap Â§qje Quarterly<space>Journal<space>of<space>Economics
+autocmd FileType bib inoremap §aer American<space>Economic<space>Review
+autocmd FileType bib inoremap §jme Journal<space>of<space>Monetary<space>Economics
+autocmd FileType bib inoremap §res Review<space>of<space>Economic<space>Studies
+autocmd FileType bib inoremap §eco Econometrica
+autocmd FileType bib inoremap §jpe Journal<space>of<space>Political<space>Economy
+autocmd FileType bib inoremap §aej American<space>Economic<space>Journal
+autocmd FileType bib inoremap §mac Macroeconomics
+autocmd FileType bib inoremap §kak Kansantaloudellinen<space>Aikakauskirja
+autocmd FileType bib inoremap §qje Quarterly<space>Journal<space>of<space>Economics
 
 " Credit to Luke Smith
 " (https://github.com/LukeSmithxyz/voidrice/blob/master/.vimrc) 
@@ -214,3 +214,5 @@ autocmd FileType java nnoremap <F2> ggipackage<space><C-r>=Kansio()<Enter>;<Esc>
 autocmd FileType matlab nnoremap <space><space> /##<Enter>c<S-e>
 autocmd FileType matlab inoremap ;func function<space>###OUTPUT<space>=<space>###NIMI<space>(###args<space>)<enter><tab>%##kommentti<enter><enter>end<esc>?###NIMI<Enter>c<S-e><C-r>=expand("%:t:r")<Enter><esc>0/###OUTPUT<Enter>c<S-e>
 autocmd FileType matlab nnoremap <F2> ggi<C-r>=readfile('/Users/tommi/.vim/templates/Matlab-template')<Cr><esc>?#email<Cr>c<S-e><C-r>=Email()<Cr><esc>dd/#pvm<Cr>c<S-e><C-r>=Pvm()<Cr><esc>/#lisenssi<Cr>c<S-e><C-r>=License()<Cr><esc>ddk$a<space>(<C-r>=Vuosi()<Cr>)<esc>/#info<Cr>c<S-e>
+
+
