@@ -6,8 +6,7 @@
 
 ;; Tähän tulee Emacsille tehtävät perusasetukset.
 ;; Laita kaikki uudet asetukset emacs.org-nimiseen tiedostoon oikean
-;; välilehden alle. org-mode tiedosto pitää asetukset paljon paremmin kasassa
-;; kuin tavallinen .el-tiedosto.
+;; välilehden alle.
 
 (package-initialize)
 
@@ -21,30 +20,22 @@
 (add-to-list 'exec-path "/Users/tommi/.local/bin")
 (add-to-list 'load-path "/Users/tommi/.emacs.d/custom")
 
-;; Lataa aliakset
-(load "aliakset.el")
-(load "funktiot.el")
+;; Lataa aliakset (load "aliakset.el") (load "funktiot.el")
 (setq-default abbrev-mode t)
-(setq abbrev-file-name "/Users/tommi/.emacs.d/custom/erikoismerkit.el")
+(setq abbrev-file-name
+      "/Users/tommi/.emacs.d/custom/erikoismerkit.el")
 (load "erikoismerkit.el")
 
 
-;; Laita oletuksena Vim-näppäimet
-(require 'evil)
-(evil-mode 1)
+;; Laita oletuksena Vim-näppäimet (require 'evil) (evil-mode 1)
 
-;; Ido-moodi päälle
-(require 'ido)
-(ido-mode t)
+;; Ido-moodi päälle (require 'ido) (ido-mode t)
 
 (require 'virtualenv)
 
-;; Käytä org-modea
-(require 'org)
-(setq org-src-fontify-natively t)
+;; Käytä org-modea (require 'org) (setq org-src-fontify-natively t)
 
-;; Käynnistä serveri geeknotea varten
-(server-start)
+;; Käynnistä serveri geeknotea varten (server-start)
 
 ;; Hae terminaalista ympäristömuuttujat
 (exec-path-from-shell-initialize)
@@ -61,12 +52,12 @@
 (yas-global-mode 1)
 
 					; Visual-mode
-(define-key evil-visual-state-map "C-ä" 'evil-window-next)
-(define-key evil-visual-state-map "årr" 'python-shell-send-region)
-(define-key evil-visual-state-map (kbd "C-ö") 'comment-line) ; Kommentoi tai unkommentoi rivi
+;;(define-key evil-visual-state-map "C-ä" 'evil-window-next)
+;;(define-key evil-visual-state-map "årr" 'python-shell-send-region)
+;;(define-key evil-visual-state-map (kbd "C-ö") 'comment-line) ; Kommentoi tai unkommentoi rivi
 
 					; Minibuffer
-(define-key minibuffer-local-map "C-ä" 'minibuffer-selected-window)
+;;(define-key minibuffer-local-map "C-ä" 'minibuffer-selected-window)
 
 
 ;;(set-keyboard-coding-system nil)
@@ -80,7 +71,7 @@
     ("3d5720f488f2ed54dd4e40e9252da2912110948366a16aef503f3e9e7dfe4915" "a4df5d4a4c343b2712a8ed16bc1488807cd71b25e3108e648d4a26b02bc990b3" default)))
  '(package-selected-packages
    (quote
-    (org-bullets suggest smartparens flycheck exec-path-from-shell jedi-direx virtualenv elpy python-mode auto-virtualenv jedi anaconda-mode yasnippet matlab-mode ess ace-window darcula-theme geeknote dracula-theme google-maps evil))))
+    (magit org-bullets suggest smartparens flycheck exec-path-from-shell jedi-direx virtualenv elpy python-mode auto-virtualenv jedi anaconda-mode yasnippet matlab-mode ess ace-window darcula-theme geeknote dracula-theme google-maps evil))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -94,4 +85,4 @@
 (org-babel-load-file
   (expand-file-name "/Users/tommi/.emacs.d/emacs.org"))
 
-
+;; Koodi päättyy

@@ -15,8 +15,7 @@ Aseta kieli siten, että oletuksenomaisesti UTF-8-merkintätapa pätee.
 
 #+BEGIN_SRC emacs-lisp
 
-(set-language-environment "UTF-8")
-(set-default-coding-systems 'utf-8)
+(set-language-environment "UTF-8") (set-default-coding-systems 'utf-8)
 
 #+END_SRC 
 ** Työkalurivi ja valikkorivi
@@ -108,6 +107,16 @@ Valitse teematiedosto, jota haluat käyttää.
 #+END_SRC 
 
 * Evil-mode
+** Mahdollista paketit
+Evil-mode mahdollistaa Vim-tyyppisten näppäinyhdistelmien käytön.
+
+#+BEGIN_SRC emacs-lisp
+
+(require 'evil)
+(evil-mode 1)
+
+#+END_SRC
+
 ** Normal-mode
 *** Tiedoston sisällä liikkuminen
 Seuraavat näppäinoikotiet on tarkoitettu helpottamaan liikkumista saman
@@ -167,7 +176,7 @@ oman näppäinoikotien.
 #+BEGIN_SRC emacs-lisp
 
 (define-key evil-normal-state-map "åg" 'find-file) ; Etsi tiedosto
-(define-key evil-normal-state-map "öi" (lambda () (interactive)(find-file "/Users/tommi/.emacs.d/init.el")))
+(define-key evil-normal-state-map "öi" (lambda () (interactive)(find-file "/Users/tommi/.emacs.d/emacs.org")))
 
 #+END_SRC 
 
