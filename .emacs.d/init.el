@@ -20,7 +20,9 @@
 (add-to-list 'exec-path "/Users/tommi/.local/bin")
 (add-to-list 'load-path "/Users/tommi/.emacs.d/custom")
 
-;; Lataa aliakset (load "aliakset.el") (load "funktiot.el")
+;; Lataa aliakset
+(load "aliakset.el")
+(load "funktiot.el")
 (setq-default abbrev-mode t)
 (setq abbrev-file-name
       "/Users/tommi/.emacs.d/custom/erikoismerkit.el")
@@ -29,13 +31,18 @@
 
 ;; Laita oletuksena Vim-näppäimet (require 'evil) (evil-mode 1)
 
-;; Ido-moodi päälle (require 'ido) (ido-mode t)
+;; Ido-moodi päälle
+(require 'ido)
+(ido-mode t)
 
 (require 'virtualenv)
 
-;; Käytä org-modea (require 'org) (setq org-src-fontify-natively t)
+;; Käytä org-modea
+(require 'org)
+(setq org-src-fontify-natively t)
 
-;; Käynnistä serveri geeknotea varten (server-start)
+;; Käynnistä serveri geeknotea varten
+(server-start)
 
 ;; Hae terminaalista ympäristömuuttujat
 (exec-path-from-shell-initialize)
@@ -68,10 +75,10 @@
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    (quote
-    ("3d5720f488f2ed54dd4e40e9252da2912110948366a16aef503f3e9e7dfe4915" "a4df5d4a4c343b2712a8ed16bc1488807cd71b25e3108e648d4a26b02bc990b3" default)))
+    ("4af6fad34321a1ce23d8ab3486c662de122e8c6c1de97baed3aa4c10fe55e060" "3d5720f488f2ed54dd4e40e9252da2912110948366a16aef503f3e9e7dfe4915" "a4df5d4a4c343b2712a8ed16bc1488807cd71b25e3108e648d4a26b02bc990b3" default)))
  '(package-selected-packages
    (quote
-    (magit org-bullets suggest smartparens flycheck exec-path-from-shell jedi-direx virtualenv elpy python-mode auto-virtualenv jedi anaconda-mode yasnippet matlab-mode ess ace-window darcula-theme geeknote dracula-theme google-maps evil))))
+    (hydra bog gandalf-theme python-cell magit org-bullets suggest smartparens flycheck exec-path-from-shell jedi-direx virtualenv elpy python-mode auto-virtualenv jedi anaconda-mode yasnippet matlab-mode ess ace-window darcula-theme geeknote dracula-theme google-maps evil))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
