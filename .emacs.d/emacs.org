@@ -28,17 +28,6 @@ palkkiin jota ei voi poistaa.
 (tool-bar-mode -1)
 
 #+END_SRC 
-** Kursori
-Aseta kursorin väri fiksummaksi kuin oletusarvo. Voit vaihtaa värin
-laittamalla heksadesimaalisen värikoodin muodossa _hxväri_, jossa väri
-voi olla mikä tahansa kuten punainen, limenvihreä jne; abbrev-mode
-korjaa tämän jälkeen värin heksadesimaalinumeroksi
-
-#+BEGIN_SRC emacs-lisp
-
-(set-cursor-color "#c8a2c8")
-
-#+END_SRC 
 ** Aloitusbuffer
 Aseta oletusarvoisesti niin, että Emacsin default-aloitusbufferi
 ei pomppaa kuvaan kun ohjelma avataan. Sen sijaan scratch-bufferi toimii
@@ -105,6 +94,43 @@ Valitse teematiedosto, jota haluat käyttää.
 (load-theme 'misterioso)
 
 #+END_SRC 
+** Kursori
+Aseta kursorin väri fiksummaksi kuin oletusarvo. Voit vaihtaa värin
+laittamalla heksadesimaalisen värikoodin muodossa _hxväri_, jossa väri
+voi olla mikä tahansa kuten punainen, limenvihreä jne; abbrev-mode
+korjaa tämän jälkeen värin heksadesimaalinumeroksi
+
+#+BEGIN_SRC emacs-lisp
+
+(set-cursor-color "#c8a2c8")
+
+#+END_SRC 
+
+* Globaalit muuttujat
+Tässä olevien muuttujien on tarkoitus kuvata näppäinyhdistelmiä, jotka toimivat kaikissa mahdollisissa
+tiloissa - tavallisten tekstitiedostojen lisäksi komentojen tulisi toimia Info, Help, Completions, Package Menu yms
+moodeissa, joihin käyttäjällä ei ole tavallisia kirjoitusoikeuksia, ja siten Evil-moden kautta tapahtuvat yhdistelmät ovat
+riittämättömiä. _Pidä tämä osio aina mahdollisimman ylhäällä!_
+** Bufferit
+
+#+BEGIN_SRC emacs-lisp
+
+(setq buffer-valikko "öb")
+(setq tapa-aukioleva-buffer "öä")
+(setq seuraava-buffer "C-j")
+(setq edellinen-buffer "C-k")
+
+#+END_SRC 
+
+** Ikkunat
+#+BEGIN_SRC emacs-lisp
+
+(setq pilko-ikkuna-horisontaalisesti "öwh")
+(setq pilko-ikkuna-vertikaalisesti "öwv")
+(setq poista-aktiivinen-ikkuna "ökt")
+(setq poista-muut-ikkunat "öka")
+
+#+END_SRC 
 
 * Evil-mode
 ** Mahdollista paketit
@@ -138,11 +164,11 @@ Hallitse ikkunoita ja liiku niiden välillä
 #+BEGIN_SRC emacs-lisp
 
 (define-key evil-normal-state-map "öö" 'ace-window) ; Mahdollista liikkuminen ikkunoiden välillä
-(define-key evil-normal-state-map "öwh" 'split-window-horizontally)
-(define-key evil-normal-state-map "öwv" 'split-window-vertically)
+(define-key evil-normal-state-map (kbd pilko-ikkuna-horisontaalisesti) 'split-window-horizontally)
+(define-key evil-normal-state-map (kbd pilko-ikkuna-vertikaalisesti) 'split-window-vertically)
 (define-key evil-normal-state-map (kbd "C-ä") 'evil-window-next)
-(define-key evil-normal-state-map "ökt" 'delete-window)
-(define-key evil-normal-state-map "öka" 'delete-other-windows)
+(define-key evil-normal-state-map (kbd poista-aktiivinen-ikkuna) 'delete-window)
+(define-key evil-normal-state-map (kbd poista-muut-ikkunat) 'delete-other-windows)
 
 #+END_SRC 
 
@@ -151,11 +177,11 @@ Hallitse buffereita ja liiku niiden välillä
 
 #+BEGIN_SRC emacs-lisp
 
-(define-key evil-normal-state-map "ås" 'save-buffer) ; Tallena tiedosto
-(define-key evil-normal-state-map "öb" 'buffer-menu)
-(define-key evil-normal-state-map "öä" 'kill-this-buffer)
-(define-key evil-normal-state-map (kbd "C-j") 'evil-next-buffer)
-(define-key evil-normal-state-map (kbd "C-k") 'evil-prev-buffer)
+(define-key evil-normal-state-map "ås" 'save-buffer) ; Tallenna tiedosto
+(define-key evil-normal-state-map (kbd buffer-valikko) 'buffer-menu)
+(define-key evil-normal-state-map (kbd tapa-aukioleva-buffer) 'kill-this-buffer)
+(define-key evil-normal-state-map (kbd seuraava-buffer) 'evil-next-buffer)
+(define-key evil-normal-state-map (kbd edellinen-buffer) 'evil-prev-buffer)
 
 #+END_SRC 
  
@@ -175,7 +201,7 @@ oman näppäinoikotien.
 
 #+BEGIN_SRC emacs-lisp
 
-(define-key evil-normal-state-map "åg" 'find-file) ; Etsi tiedosto
+(define-key evil-normal-state-map "gf" 'find-file-at-point)
 (define-key evil-normal-state-map "öi" (lambda () (interactive)(find-file "/Users/tommi/.emacs.d/emacs.org")))
 
 #+END_SRC 
@@ -222,6 +248,25 @@ jotka abbrev-mode oikolukee lennosta.
 
 #+END_SRC 
  
+*** Magit
+Magit-komennot tänne. Tässä ne yhdistetään åg-yhdistelmän alle tavalla tai
+toisella.
+
+#+BEGIN_SRC emacs-lisp
+
+;; Helpota työtä makrolla
+
+;;(defun evil/n (key func)
+;;(define-key evil-normal-state-map (kbd key) func))
+
+(defmacro evil/n (key func)
+`(define-key evil-normal-state-map (kbd ,key) (quote ,func)))
+
+(evil/n "ågs" magit-status)
+
+
+#+END_SRC 
+
 ** Insert-mode
 *** Erikoismerkit
 Erikoismerkeiksi lasketaan kaikki merkit tyyliin @, $, \ jne. Tämä osio sisältää
@@ -229,17 +274,29 @@ näppäinyhdistelmät joilla ne voi tehdä käyttäjän ollessa Insert-modessa.
 
 #+BEGIN_SRC emacs-lisp
 
+(defmacro evil/i (key body)
+`(define-key evil-insert-state-map (kbd ,key) (lambda() (interactive)(,@body))))
+
 (define-key evil-insert-state-map "åå" 'evil-force-normal-state) ; Poistu insert-modesta normal-modeen
-(define-key evil-insert-state-map "å." (lambda() (interactive)(insert "å"))) ; Lisää ruotsalainen o normaalisti
-(define-key evil-insert-state-map "å2" (lambda() (interactive)(insert "@"))) ; Tee at-merkki / at-sign
-(define-key evil-insert-state-map "å4" (lambda() (interactive)(insert "$")))
-(define-key evil-insert-state-map "å7" (lambda() (interactive)(insert "\\"))) ; Tee yksi (1) vasemmalle kallistuva kauttaviiva
-(define-key evil-insert-state-map "å8" (lambda() (interactive)(insert "[]")))
-(define-key evil-insert-state-map "å9" (lambda() (interactive)(insert "{}")))
+
+(evil/i "å." (insert "å"))
+(evil/i "å2" (insert "@"))
+(evil/i "å4" (insert "$"))
+(evil/i "å7" (insert "\\"))
+(evil/i "å8" (insert "[]"))
+(evil/i "å9" (insert "{}")) 
+(evil/i "å<" (insert "|"))
+
+;;(define-key evil-insert-state-map "å." (lambda() (interactive)(insert "å"))) ; Lisää ruotsalainen o normaalisti
+;;(define-key evil-insert-state-map "å2" (lambda() (interactive)(insert "@"))) ; Tee at-merkki / at-sign
+;;(define-key evil-insert-state-map "å4" (lambda() (interactive)(insert "$")))
+;;(define-key evil-insert-state-map "å7" (lambda() (interactive)(insert "\\"))) ; Tee yksi (1) vasemmalle kallistuva kauttaviiva
+;;(define-key evil-insert-state-map "å8" (lambda() (interactive)(insert "[]")))
+;;(define-key evil-insert-state-map "å9" (lambda() (interactive)(insert "{}")))
 (define-key evil-insert-state-map (kbd "C-ä") 'evil-window-next)
 (define-key evil-insert-state-map (kbd "C-d") 'kill-word)
 (define-key evil-insert-state-map (kbd "C-ö") 'evil-normal-state)
-(define-key evil-insert-state-map (kbd "å<") (lambda() (interactive)(insert "|")))
+;;(define-key evil-insert-state-map (kbd "å<") (lambda() (interactive)(insert "|")))
 (define-key evil-insert-state-map "ås" 'save-buffer)
 (define-key evil-insert-state-map "åc" 'shell-command)
 (define-key evil-insert-state-map (kbd "C-n") 'uusi-rivi)
@@ -269,6 +326,38 @@ highlightausta.
 #+BEGIN_SRC emacs-lisp
 
 (setq org-src-fontify-natively t)
+
+#+END_SRC 
+
+** Babel-support / koodin ajaminen
+Org-modessa on mahdollista kirjoittaa ajettavia koodinpätkiä. Aseta
+tässä ne kielet, joiden evaluointi mahdollistetaan.
+
+#+BEGIN_SRC emacs-lisp
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+  '((python . t)
+    (R . t)))
+
+#+END_SRC 
+
+
+#+RESULTS
+** Listojen ja taulukoiden manipulointi
+Meta + nuolinäppäimen avulla voi helposti liikuttaa taulukoiden
+sarakkeita ja rivejä sekä bulletpointseja otsikon alla edes takas.
+Käytä näitä jotta voit uudelleennimetä näppäimet Vim-tyylin mukaan.
+
+#+BEGIN_SRC emacs-lisp
+
+(defmacro orgmap (key func)
+ `(define-key org-mode-map (kbd ,key) (quote ,func)))
+
+(define-key org-mode-map "M-h" 'org-metaleft)
+(orgmap "M-j" org-metadown)
+(orgmap "M-k" org-metaup)
+(orgmap "M-l" org-metaright)
 
 #+END_SRC 
 
@@ -376,5 +465,49 @@ Laita tänne kaikkea höpsöttelyä.
 (message "Heihou")
 #+END_SRC 
 
+* Help- ja Info-mode
+Käytä näitä kun olet info-tilassa (esim. luet Elisp-manuaalia)
+tai olet help-tilassa (haet apua jonkun funktion määrittelyyn esim).
+** Ikkunoiden hallinta
+Liiku ikkunoiden välillä ja sulje niitä. Pyri pitämään nämä samoina kuin Evil-moden
+ikkunoiden hallintatyökalut.
+
+#+BEGIN_SRC emacs-lisp
+
+(define-key Info-mode-map (kbd pilko-ikkuna-horisontaalisesti) 'split-window-horizontally)
+(define-key Info-mode-map (kbd pilko-ikkuna-vertikaalisesti) 'split-window-vertically)
+(define-key help-mode-map (kbd pilko-ikkuna-horisontaalisesti) 'split-window-horizontally)
+(define-key help-mode-map (kbd pilko-ikkuna-vertikaalisesti) 'split-window-vertically)
+
+;; (define-key Info-mode-map (kbd "C-ä") 'evil-window-next)
+(define-key Info-mode-map (kbd poista-aktiivinen-ikkuna) 'delete-window)
+(define-key Info-mode-map (kbd poista-muut-ikkunat) 'delete-other-windows)
+;; (define-key Help-mode-map (kbd "C-ä") 'evil-window-next)
+(define-key help-mode-map (kbd poista-aktiivinen-ikkuna) 'delete-window)
+(define-key help-mode-map (kbd poista-muut-ikkunat) 'delete-other-windows)
+
+;; evil-window-kommentoitu, koska sen toiminta ei ole taattua tiloissa, joissa
+;; Evil-modea ei ole.
+
+#+END_SRC 
+
+** Bufferien hallinta
+Hallitse buffereita kuten tekisit normaalien tekstitiedostojen tapauksessa. Pyri
+pitämään nämä synkronoituna tavallisten Evil-moden buffereiden hallintatyökalujen kanssa.
+Näppäinyhdistelmissä käytettävät muuttujat löytyvät osiosta Globaalit muuttujat > Bufferit.
+
+#+BEGIN_SRC emacs-lisp
+
+(define-key Info-mode-map (kbd buffer-valikko) 'buffer-menu)
+(define-key Info-mode-map (kbd tapa-aukioleva-buffer) 'kill-this-buffer)
+(define-key help-mode-map (kbd buffer-valikko) 'buffer-menu)
+(define-key help-mode-map (kbd tapa-aukioleva-buffer) 'kill-this-buffer)
+(define-key Info-mode-map (kbd seuraava-buffer) 'switch-to-next-buffer)
+(define-key Info-mode-map (kbd edellinen-buffer) 'switch-to-prev-buffer)
+(define-key help-mode-map (kbd seuraava-buffer) 'switch-to-next-buffer)
+(define-key help-mode-map (kbd edellinen-buffer) 'switch-to-prev-buffer)
 
 
+#+END_SRC 
+* Git / Magit
+Magit-pikanäppäimet löytyvät Evil-mode-valikon alta.
