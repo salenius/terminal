@@ -38,14 +38,20 @@ avausikkunana.
 (setq inhibit-startup-screen t)
 
 #+END_SRC 
-** Meta + X -substituutti
+** Meta + X -substituutti (Smex)
 Alt + x -yhdistelmä on ergonomisesti aivan karsea. Tee näppäinyhdistelmä, jossa
-voidaan saada helpommin menu / valikko / funktiovalikko käyttöön.
+voidaan saada helpommin menu / valikko / funktiovalikko käyttöön. Olen alkanut
+käyttämään tässä pakettia smex, jonka avulla saadaan ido-tyyppinen älykäs autocompletion
+funktiovalikkoon. 
 
 #+BEGIN_SRC emacs-lisp
 
-(define-key key-translation-map (kbd "åe") (kbd "<menu>"))
-
+  (define-key key-translation-map (kbd "åe") (kbd "M-x"))
+  (define-key key-translation-map (kbd "åE") (kbd "M-X"))
+  (require 'smex)
+  (smex-initialize)
+  (global-set-key (kbd "M-x") 'smex)
+  (global-set-key (kbd "M-X") 'smex-major-mode-commands)
 #+END_SRC 
 
 ** Rivinumerot
@@ -74,6 +80,17 @@ on jo rivin alussa/lopussa ja yrittää siirtyä siitä eteenpäin.
 #+BEGIN_SRC emacs-lisp
 
 (setq ring-bell-function 'ignore)
+
+#+END_SRC 
+
+** Näytä kellonaika
+Tämän ansiosta kellonaika ja pvm näkyvät helposti. Katso vielä formatointi
+uusiksi kunnolla (24-h ajanotto jne).
+
+#+BEGIN_SRC emacs-lisp
+
+(display-time-mode 1)
+
 
 #+END_SRC 
 
@@ -200,10 +217,10 @@ sitten jotain tiettyjä usein haettavia tiedostoja, jotka tarvitsevat itsessää
 oman näppäinoikotien.
 
 #+BEGIN_SRC emacs-lisp
-
-(define-key evil-normal-state-map "gf" 'find-file-at-point)
-(define-key evil-normal-state-map "öi" (lambda () (interactive)(find-file "/Users/tommi/.emacs.d/emacs.org")))
-
+(require 'ido)
+(define-key evil-normal-state-map "gf" 'find-file)
+;;(define-key evil-normal-state-map "öi" (lambda () (interactive)(find-file "/Users/tommi/.emacs.d/emacs.org")))
+;; Käytä mieluummin 'E -yhdistelmää päästäksesi tänne
 #+END_SRC 
 
 *** Tekstin muokkaus
@@ -231,7 +248,7 @@ Käytä näitä komentoja kun tarvtiset apua jossain tilanteessa.
 #+BEGIN_SRC emacs-lisp
 
 (define-key evil-normal-state-map "åk" 'describe-key) ; Tutki äkkiä jonkun näppäinyhdistelmän merkitys 
-(define-key evil-normal-state-map "åc" 'shell-command)
+(define-key evil-normal-state-map "åt" 'shell-command)
 
 #+END_SRC 
 
@@ -267,6 +284,26 @@ toisella.
 
 #+END_SRC 
 
+*** Kirjanmerkit
+Aseta kirjanmerkkejä liikkuaksesi helposti tiedostojen välillä.
+
+#+BEGIN_SRC emacs-lisp
+
+(evil/n "åm" bookmark-set)
+(evil/n "gm" bookmark-jump)
+(evil/n "ålm" list-bookmarks)
+
+#+END_SRC 
+
+*** Kalenteri
+Avaa kalenteri
+
+#+BEGIN_SRC emacs-lisp
+
+(evil/n "åc" calendar)
+
+#+END_SRC 
+
 ** Insert-mode
 *** Erikoismerkit
 Erikoismerkeiksi lasketaan kaikki merkit tyyliin @, $, \ jne. Tämä osio sisältää
@@ -274,50 +311,62 @@ näppäinyhdistelmät joilla ne voi tehdä käyttäjän ollessa Insert-modessa.
 
 #+BEGIN_SRC emacs-lisp
 
-(defmacro evil/i (key body)
-`(define-key evil-insert-state-map (kbd ,key) (lambda() (interactive)(,@body))))
+  (defmacro evil/i (key body)
+  `(define-key evil-insert-state-map (kbd ,key) (lambda() (interactive)(,@body))))
 
-(define-key evil-insert-state-map "åå" 'evil-force-normal-state) ; Poistu insert-modesta normal-modeen
+  (define-key evil-insert-state-map (kbd "åå") 'evil-force-normal-state) ; Poistu insert-modesta normal-modeen
 
-(evil/i "å." (insert "å"))
-(evil/i "å2" (insert "@"))
-(evil/i "å4" (insert "$"))
-(evil/i "å7" (insert "\\"))
-(evil/i "å8" (insert "[]"))
-(evil/i "å9" (insert "{}")) 
-(evil/i "å<" (insert "|"))
+  (evil/i "å." (insert "å"))
+  (evil/i "å2" (insert "@"))
+  (evil/i "å4" (insert "$"))
+  (evil/i "å7" (insert "\\"))
+  (evil/i "å8" (insert "[]"))
+  (evil/i "å9" (insert "{}")) 
+  (evil/i "åi" (insert "|"))
 
-;;(define-key evil-insert-state-map "å." (lambda() (interactive)(insert "å"))) ; Lisää ruotsalainen o normaalisti
-;;(define-key evil-insert-state-map "å2" (lambda() (interactive)(insert "@"))) ; Tee at-merkki / at-sign
-;;(define-key evil-insert-state-map "å4" (lambda() (interactive)(insert "$")))
-;;(define-key evil-insert-state-map "å7" (lambda() (interactive)(insert "\\"))) ; Tee yksi (1) vasemmalle kallistuva kauttaviiva
-;;(define-key evil-insert-state-map "å8" (lambda() (interactive)(insert "[]")))
-;;(define-key evil-insert-state-map "å9" (lambda() (interactive)(insert "{}")))
-(define-key evil-insert-state-map (kbd "C-ä") 'evil-window-next)
-(define-key evil-insert-state-map (kbd "C-d") 'kill-word)
-(define-key evil-insert-state-map (kbd "C-ö") 'evil-normal-state)
-;;(define-key evil-insert-state-map (kbd "å<") (lambda() (interactive)(insert "|")))
-(define-key evil-insert-state-map "ås" 'save-buffer)
-(define-key evil-insert-state-map "åc" 'shell-command)
-(define-key evil-insert-state-map (kbd "C-n") 'uusi-rivi)
-(define-key evil-insert-state-map (kbd "C-k") 'evil-delete-backward-char)
-(define-key evil-insert-state-map (kbd "C-b") 'hakasulkeet)
+  ;;(define-key evil-insert-state-map "å." (lambda() (interactive)(insert "å"))) ; Lisää ruotsalainen o normaalisti
+  ;;(define-key evil-insert-state-map "å2" (lambda() (interactive)(insert "@"))) ; Tee at-merkki / at-sign
+  ;;(define-key evil-insert-state-map "å4" (lambda() (interactive)(insert "$")))
+  ;;(define-key evil-insert-state-map "å7" (lambda() (interactive)(insert "\\"))) ; Tee yksi (1) vasemmalle kallistuva kauttaviiva
+  ;;(define-key evil-insert-state-map "å8" (lambda() (interactive)(insert "[]")))
+  ;;(define-key evil-insert-state-map "å9" (lambda() (interactive)(insert "{}")))
+  (define-key evil-insert-state-map (kbd "C-ä") 'evil-window-next)
+  (define-key evil-insert-state-map (kbd "C-d") 'kill-word)
+  (define-key evil-insert-state-map (kbd "C-ö") 'evil-normal-state)
+  ;;(define-key evil-insert-state-map (kbd "å<") (lambda() (interactive)(insert "|")))
+  (define-key evil-insert-state-map "ås" 'save-buffer)
+  (define-key evil-insert-state-map "åc" 'shell-command)
+  (define-key evil-insert-state-map (kbd "C-n") 'uusi-rivi)
+  (define-key evil-insert-state-map (kbd "C-k") 'evil-delete-backward-char)
+  (define-key evil-insert-state-map (kbd "C-b") 'hakasulkeet)
 
 #+END_SRC 
 
 ** Visual-mode
 
 * Org-mode
+Org-modea varten tehtävät säädöt. Pyri tekemään niin, että asetukset alkavat t:llä.
 ** Bulletpoints
 Tämän käyttäminen tekee listaamiseen tarkoitetuista bulletpointeista
 kauniimman näköisiä.
 
 #+BEGIN_SRC emacs-lisp
-
+;; Aseta bulletspointsit
 (require 'org-bullets)
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 
+;; Uusi rivi ja uusi bulletpoint
+(evil-define-key 'normal org-mode-map (kbd "C-n") 'org-insert-heading)
 #+END_SRC
+ 
+** Tagit
+Aseta tagi helposti bulletpointiin
+
+#+BEGIN_SRC emacs-lisp
+
+(evil-define-key 'normal org-mode-map (kbd "tt") 'org-set-tags-command)
+
+#+END_SRC 
 
 ** Syntax highlighting
 Ilman tätä org-tiedoston koodiblokeissa ei olisi koodin omaa
@@ -325,7 +374,7 @@ highlightausta.
 
 #+BEGIN_SRC emacs-lisp
 
-(setq org-src-fontify-natively t)
+;;(setq org-src-fontify-natively t)
 
 #+END_SRC 
 
@@ -335,30 +384,183 @@ tässä ne kielet, joiden evaluointi mahdollistetaan.
 
 #+BEGIN_SRC emacs-lisp
 
-(org-babel-do-load-languages
- 'org-babel-load-languages
-  '((python . t)
-    (R . t)))
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+    '((python . t)
+      (R . t)
+      (sqlite . t)))
 
 #+END_SRC 
 
 
 #+RESULTS
-** Listojen ja taulukoiden manipulointi
+** Listojen ja taulukoiden manipulointi                    :laskentataulukko:
 Meta + nuolinäppäimen avulla voi helposti liikuttaa taulukoiden
 sarakkeita ja rivejä sekä bulletpointseja otsikon alla edes takas.
 Käytä näitä jotta voit uudelleennimetä näppäimet Vim-tyylin mukaan.
 
 #+BEGIN_SRC emacs-lisp
 
-(defmacro orgmap (key func)
- `(define-key org-mode-map (kbd ,key) (quote ,func)))
+  (defmacro orgmap (key func)
+   `(define-key org-mode-map (kbd ,key) (quote ,func)))
 
-(define-key org-mode-map "M-h" 'org-metaleft)
-(orgmap "M-j" org-metadown)
-(orgmap "M-k" org-metaup)
-(orgmap "M-l" org-metaright)
+  (defmacro evil-org (key func)
+  `(evil-define-key 'normal org-mode-map (kbd ,key) (quote ,func)))
 
+  (define-key org-mode-map (kbd "M-h") 'org-metaleft)
+  (orgmap "M-j" org-metadown)
+  (orgmap "M-k" org-metaup)
+  (orgmap "M-l" org-metaright)
+
+  ;; Laske koko taulukko uudelleen
+  (evil-org "tla" org-ctrl-c-star)
+
+  ;; Sorttaa taulukko
+  (evil-org "tls" org-sort)
+
+#+END_SRC 
+
+** Linkit
+Käytä näitä linkkien hallitsemiseen ja avaamiseen
+
+#+BEGIN_SRC emacs-lisp
+
+  (evil-org "to" org-open-at-point)
+
+#+END_SRC 
+
+** Agenda
+Agenda-moden hallitsemiseen tarkoitetut jutskat
+*** Pikanäppäin
+#+BEGIN_SRC emacs-lisp
+(evil/n "åq" org-agenda)
+(evil/i "åq" (org-agenda))
+
+#+END_SRC 
+*** Agenda-tiedostot
+Globaalissa todo-listassa org agenda kerää kaikki agenda-tiedostot määrätystä tiedostosta
+tai kansiosta. Tässä koko org-kansio asetetaan sellaiseksi.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq org-agenda-files '("/Users/tommi/org"))
+
+#+END_SRC 
+*** Komennot
+Laita tähän agenda moden sisällä tehtävät komennot
+
+#+BEGIN_SRC emacs-lisp
+  (defmacro agendamap (key func)
+    `(define-key org-agenda-mode-map (kbd ,key) (quote ,func)))
+
+  (agendamap "j" org-agenda-next-line)
+  (agendamap "k" org-agenda-previous-line)
+  (agendamap "n" org-agenda-next-item)
+  (agendamap "p" org-agenda-previous-item)
+  (agendamap "o" org-agenda-open-link)
+  (agendamap "g" org-agenda-goto-date)
+
+#+END_SRC 
+*** Ikkunat ja bufferit
+Laita tähän asetukset, joilla agenda modesta pääsee pois.
+#+BEGIN_SRC emacs-lisp
+
+  (agendamap tapa-aukioleva-buffer org-agenda-exit)
+
+#+END_SRC 
+
+** Beamer-mode                                                    :slideshow:
+Beamer-modeen tulevat asetukset
+
+#+BEGIN_SRC emacs-lisp
+
+(evil-define-key 'normal org-mode-map (kbd "te") 'org-export-dispatch)
+
+#+END_SRC 
+** Capture
+Org-capture on työkalu, jonka avulla saat kirjoitettua nopeasti ad hoc -muistiinpanon
+haluamaasi paikkaan.
+*** Pikanäppäin
+Aseta globaali pikanäppäin capturelle.
+
+#+BEGIN_SRC emacs-lisp
+  (evil/n "åw" org-capture)
+  (evil/i "åw" org-capture)
+#+END_SRC 
+
+*** Lopeta capture-tila
+Käytä tapa-buffer-komentoa luonnollisesti tähän.
+
+*** Oletussijainti
+Tallenna oletusarvoisesti kaikki org-capturet tähän tiedostoon.
+
+#+BEGIN_SRC emacs-lisp
+
+  (setq org-default-notes-file (concat org-directory "/Users/tommi/org/muistiinpanot.org"))
+
+#+END_SRC 
+
+*** Capture-template
+Lisää tähän ne templatet, joita tulet käyttämään.
+
+#+BEGIN_SRC emacs-lisp
+
+  ;;(setq org-capture-templates
+;;	'(("v" "Viittaukset" entry (file+headline "/Users/tommi/org/templates/vittaukset.org")
+;;	   ))
+
+#+END_SRC 
+
+** Todo
+Hallitse todo-listojen käyttöä hyvin. Oheisella painikkeella voit muuttaa helposti
+todo:n done:ksi jne.
+*** Pikanäppäin
+#+BEGIN_SRC emacs-lisp
+
+  (evil-define-key 'normal org-mode-map (kbd "td") 'org-todo)
+
+#+END_SRC 
+*** Tilat
+Oletuksena todo-tilassa on vain todo ja done. Tässä voi lisätä omia.
+
+#+BEGIN_SRC emacs-lisp
+
+  (setq org-todo-keywords
+	'((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "PERUTTU(c)")))
+
+#+END_SRC 
+*** Avainsanojen värit
+Määritä minkä värisiä tietyt avainsanat ovat
+
+#+BEGIN_SRC emacs-lisp
+
+  (setq org-todo-keywords-faces
+	'(("TODO" . org-warnings)
+	  ("WAITING" . "yellow")
+	  ("PERUTTU" . "blue")))
+
+#+END_SRC 
+
+** Aikataulutus ja timestamp
+
+#+BEGIN_SRC emacs-lisp
+
+  (evil-org "tat" org-time-stamp)
+  (evil-org "tad" org-deadline)
+  (evil-org "tas" org-schedule)
+
+#+END_SRC 
+
+** Koodin kirjoitus
+Src blockien hallintaan tarkoitetut työkalut tänne.
+
+#+BEGIN_SRC emacs-lisp
+
+  (defmacro srcmodemap (key func)
+    `(define-key org-src-mode-map (kbd ,key) (quote ,func)))
+
+  (evil-define-key 'normal org-src-mode-map (kbd "ts") 'org-edit-src-exit)
+  (evil-define-key 'normal org-mode-map (kbd "ts") 'org-edit-special)
 #+END_SRC 
 
 * Python
@@ -387,11 +589,11 @@ Aseta Elpy toimimaan
 
 #+BEGIN_SRC emacs-lisp
 
-(elpy-enable)
-(setq elpy-rpc-backend "/Applications/anaconda3/lib/python3.6/site-packages/")
-(setq elpy-rpc-python-command "/Users/tommi/.emacs.d/.python-environments/default/bin/python3.6")
-;;(add-hook 'python-mode-hook 'jedi:ac-setup)
-(setq jedi:complete-on-dot t)
+  (elpy-enable)
+  (setq elpy-rpc-backend "/Applications/anaconda3/lib/python3.6/site-packages/")
+  (setq elpy-rpc-python-command "/Users/tommi/.emacs.d/.python-environments/default/bin/python3.6")
+  ;;(add-hook 'python-mode-hook 'jedi:ac-setup)
+  (setq jedi:complete-on-dot t)
 
 #+END_SRC 
 
@@ -458,11 +660,58 @@ En ole saanut tätä skulaamaan vielä ollenkaan. Ota projektiksi.
 
 #+END_SRC 
 
-* Leikkikenttä
-Laita tänne kaikkea höpsöttelyä.
+* Kalenteri
+Kalenteriin tehtävät asetukset tänne.
+** Yleiset asetukset
 
 #+BEGIN_SRC emacs-lisp
-(message "Heihou")
+
+  (evil-set-initial-state 'calendar-mode 'emacs) ; Poista Evil-mode kalenteriin siirryttäessä
+
+  (defmacro calendarmap (key func)
+  `(define-key calendar-mode-map (kbd ,key) (quote ,func)))
+
+  (define-key calendar-mode-map (kbd tapa-aukioleva-buffer) 'kill-this-buffer) 
+  (calendarmap seuraava-buffer next-buffer)
+  (calendarmap edellinen-buffer previous-buffer)
+
+#+END_SRC 
+
+** Päivän etsintä
+
+#+BEGIN_SRC emacs-lisp
+
+(calendarmap "l" calendar-forward-day)
+(calendarmap "h" calendar-backward-day)
+(calendarmap "j" calendar-forward-week)
+(calendarmap "k" calendar-backward-week)
+
+(calendarmap "L" calendar-forward-month)
+(calendarmap "H" calendar-backward-month)
+(calendarmap "J" calendar-forward-year)
+(calendarmap "K" calendar-backward-year)
+
+#+END_SRC 
+
+** Suomenkieliset nimet
+Aseta eurooppalainen tyyli, suomalaiset päivä- ja kuukauden-
+nimet jne.
+
+#+BEGIN_SRC emacs-lisp
+
+  (add-hook 'calendar-load-hook
+        (lambda ()
+           (calendar-set-date-style 'european)))
+
+  (setq calendar-week-start-day 1
+	calendar-day-name-array ["su" "ma" "ti" "ke" 
+				 "to" "pe" "la"])
+  (setq calendar-month-name-array ["Tammikuu" "Helmikuu" "Maaliskuu" "Huhtikuu"
+				   "Toukokuu" "Kesäkuu" "Heinäkuu" "Elokuu"
+				   "Syyskuu" "Lokakuu" "Marraskuu" "Joulukuu"])
+
+
+
 #+END_SRC 
 
 * Help- ja Info-mode
@@ -488,7 +737,6 @@ ikkunoiden hallintatyökalut.
 
 ;; evil-window-kommentoitu, koska sen toiminta ei ole taattua tiloissa, joissa
 ;; Evil-modea ei ole.
-
 #+END_SRC 
 
 ** Bufferien hallinta
@@ -509,5 +757,92 @@ Näppäinyhdistelmissä käytettävät muuttujat löytyvät osiosta Globaalit mu
 
 
 #+END_SRC 
+* Package-menu
+Package Menu moodin asetukset
+
+** Bufferit, ikkunat ja liikkuminen
+#+BEGIN_SRC emacs-lisp
+
+  (defmacro packmap (key func)
+    `(define-key package-menu-mode-map (kbd ,key) (quote ,func)))
+
+  (packmap "j" next-line)
+  (packmap "k" previous-line)
+  (packmap seuraava-buffer next-buffer)
+  (packmap edellinen-buffer previous-buffer)
+  (packmap buffer-valikko buffer-menu)
+  (packmap tapa-aukioleva-buffer kill-this-buffer)
+  (packmap "h" backward-char)
+  (packmap "l" forward-char)
+  (packmap poista-muut-ikkunat delete-other-windows)
+  (packmap poista-aktiivinen-ikkuna delete-window)
+
+  (add-hook 'package-menu-mode-hook (lambda () (evil-mode)))
+
+#+END_SRC 
+
+** Pakettien lataus
+
+#+BEGIN_SRC emacs-lisp
+
+  (packmap "i" package-install)
+
+#+END_SRC 
+
 * Git / Magit
 Magit-pikanäppäimet löytyvät Evil-mode-valikon alta.
+* Elfeed
+Newsfeed Emacsin sisällä. Tee tänne asetukset sen varalta. Itse newsfeedit tulevat tiedostoon [[file:/Users/tommi/.emacs.d/elfeed.org][elfeed.org]].
+** Elfeed-org
+Aseta org-tiedosto, jossa voi hallita kaikkia seurattavia feedejä helposti.
+
+#+BEGIN_SRC emacs-lisp
+
+(require 'elfeed-org)
+
+(elfeed-org)
+
+(setq rmh-elfeed-org-files (list "/Users/tommi/.emacs.d/elfeed.org"))
+
+#+END_SRC 
+
+** Seurattavat sivut
+
+#+BEGIN_SRC emacs-lisp
+
+(setq elfeed-feeds
+  '("http://noahpinionblog.blogspot.com/feeds/posts/default/"
+    "http://johnhcochrane.blogspot.com/feeds/posts/default/"
+    "http://newmonetarism.blogspot.com/feeds/posts/default/"
+   ))
+
+#+END_SRC 
+
+* Elmacro
+Elmacro on työkalu, joka näyttää näppäinmakrot Elisp-funktioina
+
+#+BEGIN_SRC emacs-lisp
+
+(require 'elmacro)
+(elmacro-mode)
+
+#+END_SRC 
+
+* Internet 
+** w3m
+Selainasetukset tähän. Tämä ei toimi kunnolla, koska w3m ei asentunut oikein.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq browse-url-browser-function 'w3m-browse-url)
+(autoload 'w3m-browse-url "w3m" "Pyydä www-selainta näyttämään URL." t)
+
+#+END_SRC 
+
+* Leikkikenttä
+Laita tänne kaikkea höpsöttelyä.
+
+#+BEGIN_SRC emacs-lisp
+(message "Heihou")
+#+END_SRC 
+
