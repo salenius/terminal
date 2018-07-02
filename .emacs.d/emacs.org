@@ -15,15 +15,29 @@ Aseta kieli siten, että oletuksenomaisesti UTF-8-merkintätapa pätee.
 
 #+BEGIN_SRC emacs-lisp
 
-(set-language-environment "UTF-8") (set-default-coding-systems 'utf-8)
-(set-locale-environment "fi_FI.UTF-8")
+  (set-language-environment "UTF-8") (set-default-coding-systems 'utf-8)
+  (set-locale-environment "fi_FI.UTF-8")
 
+  (setq initial-scratch-message "Toimii")
 #+END_SRC 
+** Käyttäjätiedot
+#+name: user-info
+| Muuttuja                | Arvo               |
+|-------------------------+--------------------|
+| tommisalenius@gmail.com | 'user-mail-address |
+| tommisalenius@gmail.com | 'sähköpostiosoite  |
+#+BEGIN_SRC emacs-lisp :exports code :var user-info=user-info
+;;(taulukko-eval 'meitsin-setq user-info t)
+#+end_SRC
+
+#+RESULTS:
+| tommisalenius@gmail.com | 'user-mail-address |
+| tommisalenius@gmail.com | 'sähköpostiosoite  |
+
 ** Työkalurivi ja valikkorivi
 Piilota työkalurivi oletusarvoisesti. Valikkoriviä ei tarvitse piilottaa, koska
 Macissa se on sijoitettuna automaattisesti ikkunan yläpuolella sijaitsevaan
 palkkiin jota ei voi poistaa.
-
 #+BEGIN_SRC emacs-lisp
 
 (tool-bar-mode -1)
@@ -39,21 +53,30 @@ avausikkunana.
 (setq inhibit-startup-screen t)
 
 #+END_SRC 
-** Meta + X -substituutti (Smex)
-Alt + x -yhdistelmä on ergonomisesti aivan karsea. Tee näppäinyhdistelmä, jossa
-voidaan saada helpommin menu / valikko / funktiovalikko käyttöön. Olen alkanut
-käyttämään tässä pakettia smex, jonka avulla saadaan ido-tyyppinen älykäs autocompletion
-funktiovalikkoon. 
+** Rivin highlightaus
+#+BEGIN_SRC emacs-lisp
 
+(global-hl-line-mode 1)
+
+#+END_SRC 
+
+** Meta + X -substituutti (Helm/Smex)
+Alt + x -yhdistelmä on ergonomisesti aivan karsea. Tee näppäinyhdistelmä, jossa
+voidaan saada helpommin menu / valikko / funktiovalikko käyttöön. 
+Käytän tässä counsel-nimistä autocomplete-työkalua. 
 
 #+BEGIN_SRC emacs-lisp
 
   (define-key key-translation-map (kbd "åe") (kbd "M-x"))
   (define-key key-translation-map (kbd "åE") (kbd "M-X"))
-  (require 'smex)
-  (smex-initialize)
-  (global-set-key (kbd "M-x") 'smex)
+  ;; (require 'smex)
+  ;; (smex-initialize)
+  ;; ;; (global-set-key (kbd "M-x") 'smex)
   (global-set-key (kbd "M-X") 'smex-major-mode-commands)
+  ;; (require 'helm)
+  ;; (global-set-key (kbd "M-x") 'helm-M-x)
+  (require 'counsel)
+  (global-set-key (kbd "M-x") 'counsel-M-x)
 #+END_SRC 
 
 ** Rivinumerot
@@ -96,6 +119,15 @@ uusiksi kunnolla (24-h ajanotto jne).
 
 #+END_SRC 
 
+** Kyllä ja ei -kysymykset
+Aseta niin, että voit vastata yes or no -tyylisiin kyssäreihiin vain y tai n. Helpottaa elämää.
+
+#+BEGIN_SRC emacs-lisp
+
+(fset 'yes-or-no-p 'y-or-n-p)
+
+#+END_SRC 
+
 ** Terminaali / shell
 Aseta oletusarvoisesti zsh terminaaliksi, joka avataan kun käsky annetaan.
 
@@ -122,6 +154,17 @@ korjaa tämän jälkeen värin heksadesimaalinumeroksi
 #+BEGIN_SRC emacs-lisp
 
 (set-cursor-color "#c8a2c8")
+
+#+END_SRC 
+
+** Autocomplete
+Pistä popup-valikko funktioille pystyyn.
+#+BEGIN_SRC emacs-lisp
+
+(require 'company)
+
+(add-hook 'emacs-lisp-mode-hook 'company-mode)
+(add-hook 'lisp-interactive-mode-hook 'company-mode)
 
 #+END_SRC 
 
@@ -158,6 +201,20 @@ Tässä olevien muuttujien on tarkoitus kuvata näppäinyhdistelmiä, jotka toim
 tiloissa - tavallisten tekstitiedostojen lisäksi komentojen tulisi toimia Info, Help, Completions, Package Menu yms
 moodeissa, joihin käyttäjällä ei ole tavallisia kirjoitusoikeuksia, ja siten Evil-moden kautta tapahtuvat yhdistelmät ovat
 riittämättömiä. _Pidä tämä osio aina mahdollisimman ylhäällä!_
+** Julista muuttujat
+#+BEGIN_SRC emacs-lisp
+
+  (defvar buffer-valikko)
+  (defvar tapa-aukioleva-buffer)
+  (defvar seuraava-buffer)
+  (defvar edellinen-buffer)
+  (defvar pilko-ikkuna-horisontaalisesti)
+  (defvar pilko-ikkuna-vertikaalisesti)
+  (defvar poista-aktiivinen-ikkuna)
+  (defvar poista-muut-ikkunat)
+
+#+END_SRC 
+
 ** Bufferit
 
 #+BEGIN_SRC emacs-lisp
@@ -171,11 +228,20 @@ riittämättömiä. _Pidä tämä osio aina mahdollisimman ylhäällä!_
 
 ** Ikkunat
 #+BEGIN_SRC emacs-lisp
+  (setq vaihda-ikkunaa "öö")
+  (setq pilko-ikkuna-horisontaalisesti "öwh")
+  (setq pilko-ikkuna-vertikaalisesti "öwv")
+  (setq poista-aktiivinen-ikkuna "ökt")
+  (setq poista-muut-ikkunat "öka")
 
-(setq pilko-ikkuna-horisontaalisesti "öwh")
-(setq pilko-ikkuna-vertikaalisesti "öwv")
-(setq poista-aktiivinen-ikkuna "ökt")
-(setq poista-muut-ikkunat "öka")
+#+END_SRC 
+
+
+** Tallennus
+Asetukset, joilla voi tallentaa.
+#+BEGIN_SRC emacs-lisp
+
+(setq tallennus "ås")
 
 #+END_SRC 
 
@@ -193,12 +259,41 @@ Evil-mode mahdollistaa Vim-tyyppisten näppäinyhdistelmien käytön.
 ** Makrot
 #+BEGIN_SRC emacs-lisp
 
-(defmacro evil/n (key func)
-`(define-key evil-normal-state-map (kbd ,key) (quote ,func)))
+      ;; Metamakro
+  (defmacro taulukko-eval (func table str)
+       "Makro, jolla voit äkkiä kirjoittaa mikä taulukko TABLE kuvaa niitä
+    näppäinyhdistelmiä, jotka tuottavat tietyn funktion FUNC. STR on t tai nil
+    riippuen siitä onko taulukon 1. sarake tarkoitettu tulkittavaksi merkkijonona
+    vai symbolina, eli laitetaanko sen ympärille sitaatit vai ei."
+    `(mapc (lambda (x) (lue-merkki-pari x ,func ,str)) ,table))
 
-(defmacro evil/i (key body)
-`(define-key evil-insert-state-map (kbd ,key) (lambda() (interactive)(,@body))))
 
+    (defmacro kirjoita (merkki)
+      `(lambda ()
+	 (interactive)(insert ,merkki)))
+
+    (defmacro def-avain (nimi moodi)
+      "Yleistyökalu, jonka avulla käyttäjä voi luoda funktioita, jotka asettavat
+    puolestaan pikanäppäinkomennon tietyn tilan funktioille. NIMI on funktion nimi,
+    jonka makro palauttaa, MOODI on puolesta mode, jolle funktio voi luoda näppäinyhdistelmän."
+      `(defun ,nimi (key func)
+	 (define-key ,moodi (kbd key) func)))
+
+    (def-avain evil/ins evil-insert-state-map)
+
+
+      ;; (defmacro evil/n (key func)
+      ;; `(define-key evil-normal-state-map (kbd ,key) (quote ,func)))
+
+    (def-avain evil/n evil-normal-state-map)
+    (def-avain evil/i evil-insert-state-map)
+    (def-avain evil/m evil-motion-state-map)
+
+      ;; (defmacro evil/i (key body)
+      ;; `(define-key evil-insert-state-map (kbd ,key) (lambda() (interactive)(,@body))))
+
+      ;; (defmacro evil/m (key func)
+      ;; `(define-key evil-motion-state-map (kbd ,key) (quote ,func)))
 #+END_SRC 
 
 ** Normal-mode
@@ -206,41 +301,75 @@ Evil-mode mahdollistaa Vim-tyyppisten näppäinyhdistelmien käytön.
 Seuraavat näppäinoikotiet on tarkoitettu helpottamaan liikkumista saman
 bufferin ja ikkunan sisällä.
 
-#+BEGIN_SRC emacs-lisp
+#+name: normaalimuodot
+| Näppäinyhdistelmä | Funktio               |
+|-------------------+-----------------------|
+| §                 | 'end-of-line          |
+| zj                | 'evil-scroll-down     |
+| zk                | 'evil-scroll-up       |
+| '                 | 'evil-search-forward  |
+| +                 | 'evil-search-backward |
 
-(evil/n "§" end-of-line) ; Mene rivin loppuun
-(evil/n "zj" evil-scroll-down)
-(evil/n "zk" evil-scroll-up)
-(evil/n "'" evil-search-forward) ; Aseta ' että voi etsiä eteenpäin
-(evil/n "+" evil-search-backward) ; Aseta ' että voi etsiä taaksepäin
-
+#+BEGIN_SRC emacs-lisp :exports code :var normaalimuodot=normaalimuodot
+  (mapc (lambda (x) (lue-merkki-pari x 'evil/n t)) normaalimuodot)
 #+END_SRC 
+
+#+RESULTS:
+| §  | 'end-of-line          |
+| zj | 'evil-scroll-down     |
+| zk | 'evil-scroll-up       |
+| '  | 'evil-search-forward  |
+| +  | 'evil-search-backward |
 
 *** Ikkunat
 Hallitse ikkunoita ja liiku niiden välillä
 
-#+BEGIN_SRC emacs-lisp
-
-(evil/n "öö" ace-window) ; Mahdollista liikkuminen ikkunoiden välillä
-(evil/n pilko-ikkuna-horisontaalisesti split-window-horizontally)
-(evil/n pilko-ikkuna-vertikaalisesti split-window-vertically)
-(evil/n poista-aktiivinen-ikkuna delete-window)
-(evil/n poista-muut-ikkunat delete-other-windows)
+#+name: evil-ikkunat
+| Aktiviteetti                   | Funktio                    |
+|--------------------------------+----------------------------|
+| vaihda-ikkunaa                 | 'ace-window                |
+| pilko-ikkuna-horisontaalisesti | 'split-window-horizontally |
+| pilko-ikkuna-vertikaalisesti   | 'split-window-vertically   |
+| poista-aktiivinen-ikkuna       | 'delete-window             |
+| poista-muut-ikkunat            | 'delete-other-windows      |
+#+BEGIN_SRC emacs-lisp :exports code :var evil-ikkunat=evil-ikkunat
+  (taulukko-eval 'evil/n evil-ikkunat nil)
+  ;; (evil/n vaihda-ikkunaa 'ace-window) ; Mahdollista liikkuminen ikkunoiden välillä
+  ;; (evil/n pilko-ikkuna-horisontaalisesti 'split-window-horizontally)
+  ;; (evil/n pilko-ikkuna-vertikaalisesti 'split-window-vertically)
+  ;; (evil/n poista-aktiivinen-ikkuna 'delete-window)
+  ;; (evil/n poista-muut-ikkunat 'delete-other-windows)
 
 #+END_SRC 
+
+#+RESULTS:
+| vaihda-ikkunaa                 | 'ace-window                |
+| pilko-ikkuna-horisontaalisesti | 'split-window-horizontally |
+| pilko-ikkuna-vertikaalisesti   | 'split-window-vertically   |
+| poista-aktiivinen-ikkuna       | 'delete-window             |
+| poista-muut-ikkunat            | 'delete-other-windows      |
 
 *** Bufferit
 Hallitse buffereita ja liiku niiden välillä
 
-#+BEGIN_SRC emacs-lisp
-
-(define-key evil-normal-state-map "ås" 'save-buffer) ; Tallenna tiedosto
-(define-key evil-normal-state-map (kbd buffer-valikko) 'buffer-menu)
-(define-key evil-normal-state-map (kbd tapa-aukioleva-buffer) 'kill-this-buffer)
-(define-key evil-normal-state-map (kbd seuraava-buffer) 'evil-next-buffer)
-(define-key evil-normal-state-map (kbd edellinen-buffer) 'evil-prev-buffer)
-
+#+name: puskurit
+| Näppäinyhdistelmä     | Funktio           |
+|-----------------------+-------------------|
+| tallennus             | 'save-buffer      |
+| buffer-valikko        | 'ibuffer          |
+| tapa-aukioleva-buffer | 'kill-this-buffer |
+| seuraava-buffer       | 'evil-next-buffer |
+| edellinen-buffer      | 'evil-prev-buffer |
+#+BEGIN_SRC emacs-lisp :exports code :var puskurit=puskurit
+  (taulukko-eval 'evil/n puskurit nil)
 #+END_SRC 
+
+#+RESULTS:
+| tallennus             | 'save-buffer      |
+| buffer-valikko        | 'ibuffer          |
+| tapa-aukioleva-buffer | 'kill-this-buffer |
+| seuraava-buffer       | 'evil-next-buffer |
+| edellinen-buffer      | 'evil-prev-buffer |
  
 *** Makrot
 Käytä tätä komentoa makron ajamiseen.
@@ -258,7 +387,8 @@ oman näppäinoikotien.
 
 #+BEGIN_SRC emacs-lisp
 (require 'ido)
-(define-key evil-normal-state-map "gf" 'find-file)
+(ido-vertical-mode 1)
+(define-key evil-normal-state-map "gf" 'ido-find-file)
 ;;(define-key evil-normal-state-map "öi" (lambda () (interactive)(find-file "/Users/tommi/.emacs.d/emacs.org")))
 ;; Käytä mieluummin 'E -yhdistelmää päästäksesi tänne
 #+END_SRC 
@@ -269,7 +399,7 @@ siirtyä Insert-modeen
 
 #+BEGIN_SRC emacs-lisp
 
-(evil/n "C-ö" comment-line) ; Kommentoi tai unkommentoi rivi
+(evil/n "C-ö" 'comment-line) ; Kommentoi tai unkommentoi rivi
 
 #+END_SRC 
 
@@ -278,7 +408,7 @@ Luo uusia Yas-snippettejä, jotka ovat moodispesifejä
 
 #+BEGIN_SRC emacs-lisp
 
-(evil/n "åns" yas-new-snippet) ; Luo uusi snippetti, joka on asiaankuuluvassa moodissa
+(evil/n "åns" 'yas-new-snippet) ; Luo uusi snippetti, joka on asiaankuuluvassa moodissa
 
 #+END_SRC 
 
@@ -287,21 +417,38 @@ Käytä näitä komentoja kun tarvtiset apua jossain tilanteessa.
 
 #+BEGIN_SRC emacs-lisp
 
-(evil/n "åk" describe-key) ; Tutki äkkiä jonkun näppäinyhdistelmän merkitys 
-(evil/n "åt" shell-command)
+(evil/n "åk" 'describe-key) ; Tutki äkkiä jonkun näppäinyhdistelmän merkitys 
+(evil/n "åt" 'shell-command)
 
 #+END_SRC 
 
 *** Oikoluku / abbrev
 Käytä näitä komentoja luodaksesi lennosta uusia abbrev-taulukon alkioita, 
 jotka abbrev-mode oikolukee lennosta.
+#+name: abbrev-taulukko
+| Näppäinyhdistelmä | Funktio                    |
+|-------------------+----------------------------|
+| åag               | 'add-global-abbrev         |
+| åam               | 'add-more-abbrev           |
+| åaig              | 'inverse-add-global-abbrev |
+| åaim              | 'inverse-add-more-abbrev   |
+#+BEGIN_SRC emacs-lisp :exports code :var abbrev-taulukko=abbrev-taulukko
+(taulukko-eval 'evil/n abbrev-taulukko t)
+#+end_SRC
+
+#+RESULTS:
+| åag  | 'add-global-abbrev         |
+| åam  | 'add-more-abbrev           |
+| åaig | 'inverse-add-global-abbrev |
+| åaim | 'inverse-add-more-abbrev   |
+
 
 #+BEGIN_SRC emacs-lisp
 
-(evil/n "åag" add-global-abbrev)
-(evil/n "åam" add-mode-abbrev)
-(evil/n "åaig" inverse-add-global-abbrev)
-(evil/n "åaim" inverse-add-mode-abbrev)
+  ;; (evil/n "åag" 'add-global-abbrev)
+  ;; (evil/n "åam" 'add-mode-abbrev)
+  ;; (evil/n "åaig" 'inverse-add-global-abbrev)
+  ;; (evil/n "åaim" 'inverse-add-mode-abbrev)
 
 #+END_SRC 
  
@@ -316,18 +463,31 @@ toisella.
 ;;(defun evil/n (key func)
 ;;(define-key evil-normal-state-map (kbd key) func))
 
-(evil/n "ågs" magit-status)
+(evil/n "ågs" 'magit-status)
 
 #+END_SRC 
 
 *** Kirjanmerkit
 Aseta kirjanmerkkejä liikkuaksesi helposti tiedostojen välillä.
 
+#+name: kirjanmerkki-evil
+| Näppäinyhdistelmä | Funktio         |
+|-------------------+-----------------|
+| ånm               | 'bookmark-set   |
+| gm                | 'bookmark-jump  |
+#+BEGIN_SRC emacs-lisp :exports code :var kirjanmerkki-evil=kirjanmerkki-evil
+(taulukko-eval 'evil/n kirjanmerkki-evil t)
+#+end_SRC
+
+#+RESULTS:
+| ånm | 'bookmark-set  |
+| gm  | 'bookmark-jump |
+
 #+BEGIN_SRC emacs-lisp
 
-(evil/n "ånm" bookmark-set)
-(evil/n "gm" bookmark-jump)
-(evil/n "ålm" list-bookmarks)
+  ;; (evil/n "ånm" 'bookmark-set)
+  ;; (evil/n "gm" 'bookmark-jump)
+  ;; (evil/n "ålm" 'list-bookmarks)
 
 #+END_SRC 
 
@@ -340,6 +500,22 @@ Avaa kalenteri. Suluissa, koska pikanäppäin osoittaa nykyään laskimeen.
 
 #+END_SRC 
 
+*** Hookit
+#+BEGIN_SRC emacs-lisp
+
+  (add-hook 'evil-normal-state-entry-hook (lambda () (global-hl-line-mode 1)))
+
+#+END_SRC 
+
+*** Help / apua
+#+BEGIN_SRC emacs-lisp
+
+(evil/n "åhk" 'counsel-descbinds)
+(evil/n "åhf" 'counsel-describe-function)
+(evil/n "åhv" 'counsel-describe-variable)
+
+#+END_SRC 
+
 ** Insert-mode
 *** Erikoismerkit
 Erikoismerkeiksi lasketaan kaikki merkit tyyliin @, $, \ jne. Tämä osio sisältää
@@ -347,36 +523,54 @@ näppäinyhdistelmät joilla ne voi tehdä käyttäjän ollessa Insert-modessa.
 
 #+BEGIN_SRC emacs-lisp
 
-  (defmacro evil/i (key body)
-   `(define-key evil-insert-state-map (kbd ,key) (lambda() (interactive)(,@body))))
+  ;; (defmacro evil/i (key body)
+  ;;  `(define-key evil-insert-state-map (kbd ,key) (lambda() (interactive)(,@body))))
 
 
-    (define-key evil-insert-state-map (kbd "åå") 'evil-force-normal-state) ; Poistu insert-modesta normal-modeen
-  (evil/i "¨d" (insert "$"))
-  (evil/i "¨." (insert "¨"))
-  (evil/i "¨s" (insert "\\"))
-  (evil/i "¨q" (insert "\""))
-  (evil/i "¨c" (aaltosulkeet))
+  (define-key evil-insert-state-map (kbd "åå") 'evil-force-normal-state) ; Poistu insert-modesta normal-modeen
+  (evil/i "¨d" (kirjoita "$"))
+  (evil/i "¨." (kirjoita "¨"))
+  (evil/i "¨s" (kirjoita "\\"))
+  (evil/i "¨q" (kirjoita "\""))
+  (evil/i "¨c" 'aaltosulkeet)
 
-  (evil/i "å." (insert "å"))
-  (evil/i "å2" (insert "@"))
-  (evil/i "å4" (insert "$"))
-  (evil/i "å7" (insert "\\"))
-  (evil/i "å8" (insert "[]"))
-  (evil/i "å9" (insert "{}"))
-  (evil/i "åi" (insert "|"))
+  (evil/i "å2" (kirjoita "@"))
+  (evil/i "å4" (kirjoita "$"))
+  (evil/i "å7" (kirjoita "\\"))
+  (evil/i "å8" (kirjoita "[]"))
+  (evil/i "å9" (kirjoita "{}"))
+  (evil/i "åi" (kirjoita "|"))
+  (evil/i "å." (kirjoita "å"))
+  
+  (evil/i "C-d" 'kill-word)
+  (evil/i "C-ö" 'evil-normal-state)
+  (evil/i "ås" 'save-buffer)
+  (evil/i "åc" 'shell-command)
+  ;; (define-key evil-insert-state-map (kbd "C-n") 'uusi-rivi)
+  (evil/i "C-k" 'evil-delete-backward-char)
+  (evil/i "C-b" 'hakasulkeet)
 
-  (define-key evil-insert-state-map (kbd "C-d") 'kill-word)
-  (define-key evil-insert-state-map (kbd "C-ö") 'evil-normal-state)
-  (define-key evil-insert-state-map "ås" 'save-buffer)
-  (define-key evil-insert-state-map "åc" 'shell-command)
-  (define-key evil-insert-state-map (kbd "C-n") 'uusi-rivi)
-  (define-key evil-insert-state-map (kbd "C-k") 'evil-delete-backward-char)
-  (define-key evil-insert-state-map (kbd "C-b") 'hakasulkeet)
+#+END_SRC 
+
+*** Hookit
+
+#+BEGIN_SRC emacs-lisp
+
+  (add-hook 'evil-insert-state-entry-hook (lambda () (global-hl-line-mode -1)))
 
 #+END_SRC 
 
 ** Visual-mode 
+** Motion-mode
+Motion-state on tila, jota käytetään erikoistiedostoissa, joissa ei voi
+tehdä muutoksia, mutta halutaan silti käyttää Vim-näppäinyhdistelmiä
+liikkumiseen.
+
+#+BEGIN_SRC emacs-lisp
+  (evil/m "SPC" 'counsel-find-file)
+
+#+END_SRC 
+
 ** Omat funktiot
 Evil-moden omat komennot, jotka saadaan avattua :-komennolla. Käytä defun-sijaan evil-define-command-alkua.
 
@@ -395,7 +589,7 @@ kauniimman näköisiä.
 ;; Aseta bulletspointsit
 (require 'org-bullets)
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
-
+ 
 ;; Uusi rivi ja uusi bulletpoint
 (evil-define-key 'normal org-mode-map (kbd "C-n") 'org-insert-heading)
 #+END_SRC
@@ -474,8 +668,8 @@ Käytä näitä linkkien hallitsemiseen ja avaamiseen
 Agenda-moden hallitsemiseen tarkoitetut jutskat
 *** Pikanäppäin
 #+BEGIN_SRC emacs-lisp
-(evil/n "åq" org-agenda)
-(evil/i "åq" (org-agenda))
+(evil/n "åv" 'org-agenda)
+(evil/i "åv" 'org-agenda)
 
 #+END_SRC 
 *** Agenda-tiedostot
@@ -525,8 +719,8 @@ haluamaasi paikkaan.
 Aseta globaali pikanäppäin capturelle.
 
 #+BEGIN_SRC emacs-lisp
-  (evil/n "åw" org-capture)
-  (evil/i "åw" org-capture)
+  (evil/n "åw" 'org-capture)
+  (evil/i "åw" 'org-capture)
 #+END_SRC 
 
 *** Lopeta capture-tila
@@ -546,10 +740,18 @@ Lisää tähän ne templatet, joita tulet käyttämään.
 
 #+BEGIN_SRC emacs-lisp
 
-  ;;(setq org-capture-templates
-;;	'(("v" "Viittaukset" entry (file+headline "/Users/tommi/org/templates/vittaukset.org")
-;;	   ))
+    ;;(setq org-capture-templates
+  ;;	'(("v" "Viittaukset" entry (file+headline "/Users/tommi/org/templates/vittaukset.org")
+  ;;	   ))
 
+  (setq org-capture-templates
+	'(("d" "Duuniasia" entry (file+headline "/Users/tommi/org/todo.org" "BoF")
+	   "* TODO %? \n %^t")
+	  ("g" "Gradu" entry (file+headline "/Users/tommi/org/templates/viittaukset.org" "Makrotaloustiede")
+	   "* TODO %^{Otsikko} \n %t \n %? \n - Tekijä(t): %^{Tekijät} \n - Julkaisu: %^{Julkaisu} \n - Vuosi: %^{Vuosi} \n - Numero: %^{Numero} \n - Sivu: %^{Sivu}")
+	  ("t" "Tapahtuma" entry (file+headline "/Users/tommi/org/todo.org" "Tapahtumat")
+	   "* %^{Nimi}\n*Aika:* %^t\n*Paikka:* %^{Paikka}\n*Järjestäjä:* %^{Järjestäjä|tuntematon}\n*Muuta:* %?")
+	  ))
 #+END_SRC 
 
 ** Todo
@@ -579,6 +781,17 @@ Määritä minkä värisiä tietyt avainsanat ovat
 	'(("TODO" . org-warnings)
 	  ("WAITING" . "yellow")
 	  ("PERUTTU" . "blue")))
+
+#+END_SRC 
+
+** Ctrl-c Ctrl-c
+Org-moden taikanappula joka pystyy tekemään useita asiota:
+- Ajamaan koodisnipettejä
+- Päivittämään taulukon kaavoja
+- Luomaan linkkejä avainsanoihin perustuen
+#+BEGIN_SRC emacs-lisp
+
+  (orgmap "år" org-ctrl-c-ctrl-c)
 
 #+END_SRC 
 
@@ -658,6 +871,14 @@ eroon.
 #+END_SRC 
 
 * Elisp / Emacs-Lisp
+** Makrot
+#+BEGIN_SRC emacs-lisp
+
+  (defmacro elispmap (key func)
+      `(define-key lisp-mode-shared-map (kbd ,key) (quote ,func)))
+
+#+END_SRC 
+
 ** Evaluointi
 Lisp-lauseiden ajaminen tulkin läpi.
 
@@ -671,9 +892,29 @@ Lisp-lauseiden ajaminen tulkin läpi.
   ;;     (move-end-of-line 1)
   ;;     (eval-last-sexp arg)))
 
+  ;; Yleiseen käyttöön
+  (evil/n "ål" 'lisp-evaluointi)
+  (evil/i "ål" 'lisp-evaluointi)
+  ;; Lisp-moden spesifiseen käyttöön
+  (elispmap "år" lisp-evaluointi)
+#+END_SRC 
 
-  (evil/n "årl" lisp-evaluointi)
-  (define-key evil-insert-state-map (kbd "årl") 'lisp-evaluointi)
+** Dokumentointi / elisp-def
+Etsi funktioiden dokumentointia.
+
+#+BEGIN_SRC emacs-lisp
+  (require 'elisp-def)
+  (elisp-def-mode 1)
+
+  (add-hook 'emacs-lisp-mode-hook
+	    (lambda () (define-key lisp-mode-shared-map "åd" 'elisp-def)))
+
+
+#+END_SRC 
+** Sulkeiden tuotanto
+#+BEGIN_SRC emacs-lisp
+
+  (elispmap "C-n" kaarisulkeet)
 
 #+END_SRC 
 
@@ -712,6 +953,40 @@ Credit to Steve Yegge. Tälle pitäisi keksiä jokin näppäinyhdistelmä.
  ;   "Toimii kuten evil-normal-state, mutta järjestää asian niin, että kursori ei liiku vasemmalle siirryttäessä edestakaisin normal- ja insert-moden välillä."
  ;; (evil-normal-state)(evil-forward-char))
 
+
+#+END_SRC 
+
+** Evil-tilojen vaihto
+Näiden funktioiden avulla voit helposti tehdä kirjoittamiskokemuksesta mukavaa.
+Funktioista on tullut turhia koska lisäsin entry-hookit normal- ja insert-tiloille.
+#+BEGIN_SRC emacs-lisp
+
+  (defun kirjoita-rauhassa ()
+    "Aloita kirjoittaminen kursoria edeltävältä paikalta (Vimin 'i' painike)
+  ja poista rivin highlightaus."
+    (interactive)
+    (evil-insert 1)
+    (global-hl-line-mode -1))
+
+  (defun jatka-kirjoitusta-rauhassa ()
+    "Aloita kirjoittaminen kursorin jälkeiseltä paikalta (Vimin 'a' painike)
+  ja poista rivin highlighttaus."
+    (interactive)
+    (evil-append 1)
+    (global-hl-line-mode -1))
+
+
+  (defun poistu-ja-näytä-rivi ()
+    "Highlightaa rivi kun poistut Insert-tilasta."
+    (interactive)
+    (evil-normal-state 1)
+    (global-hl-line-mode 1))
+
+  ;; Käytä hyväksi uusia funktioita
+
+  ;; (evil/n "a" 'jatka-kirjoitusta-rauhassa)
+  ;; (evil/n "i" 'kirjoita-rauhassa)
+  ;; (evil/i "C-ö" 'poistu-ja-näytä-rivi)
 
 #+END_SRC 
 
@@ -784,35 +1059,44 @@ nimet jne.
 * Help- ja Info-mode
 Käytä näitä kun olet info-tilassa (esim. luet Elisp-manuaalia)
 tai olet help-tilassa (haet apua jonkun funktion määrittelyyn esim).
+
+** Makrot
+#+BEGIN_SRC emacs-lisp
+
+(def-avain helpmap help-mode-map)
+(def-avain infomap Info-mode-map)
+
+#+END_SRC 
+
 ** Ikkunoiden hallinta
 Liiku ikkunoiden välillä ja sulje niitä. Pyri pitämään nämä samoina kuin Evil-moden
 ikkunoiden hallintatyökalut.
 
 #+BEGIN_SRC emacs-lisp
 
-  (defmacro helpmap (key func)
-      `(define-key help-mode-map (kbd ,key) (quote ,func)))
+  ;; (defmacro helpmap (key func)
+  ;;     `(define-key help-mode-map (kbd ,key) (quote ,func)))
 
-  (defmacro infomap (key func)
-      `(define-key Info-mode-map (kbd ,key) (quote ,func)))
+  ;; (defmacro infomap (key func)
+  ;;     `(define-key Info-mode-map (kbd ,key) (quote ,func)))
 
-  (infomap pilko-ikkuna-horisontaalisesti split-window-horizontally)
-  (infomap pilko-ikkuna-vertikaalisesti split-window-vertically)
-  (helpmap pilko-ikkuna-horisontaalisesti split-window-horizontally)
-  (helpmap pilko-ikkuna-vertikaalisesti split-window-vertically)
+
+  (infomap pilko-ikkuna-horisontaalisesti 'split-window-horizontally)
+  (infomap pilko-ikkuna-vertikaalisesti 'split-window-vertically)
+  (helpmap pilko-ikkuna-horisontaalisesti 'split-window-horizontally)
+  (helpmap pilko-ikkuna-vertikaalisesti 'split-window-vertically)
 
   ;; (define-key Info-mode-map (kbd "C-ä") 'evil-window-next)
-  (infomap poista-aktiivinen-ikkuna delete-window)
-  (infomap poista-muut-ikkunat delete-other-windows)
+  (infomap poista-aktiivinen-ikkuna 'delete-window)
+  (infomap poista-muut-ikkunat 'delete-other-windows)
   ;; (define-key Help-mode-map (kbd "C-ä") 'evil-window-next)
-  (helpmap poista-aktiivinen-ikkuna delete-window)
-  (helpmap poista-muut-ikkunat delete-other-windows)
-  (helpmap "öö" ace-window)
-  (infomap "öö" ace-window)
+  (helpmap poista-aktiivinen-ikkuna 'delete-window)
+  (helpmap poista-muut-ikkunat 'delete-other-windows)
+  (helpmap "öö" 'ace-window)
+  (infomap "öö" 'ace-window)
   ;; evil-window-kommentoitu, koska sen toiminta ei ole taattua tiloissa, joissa
   ;; Evil-modea ei ole.
 #+END_SRC 
-
 ** Bufferien hallinta
 Hallitse buffereita kuten tekisit normaalien tekstitiedostojen tapauksessa. Pyri
 pitämään nämä synkronoituna tavallisten Evil-moden buffereiden hallintatyökalujen kanssa.
@@ -820,14 +1104,14 @@ Näppäinyhdistelmissä käytettävät muuttujat löytyvät osiosta Globaalit mu
 
 #+BEGIN_SRC emacs-lisp
 
-(infomap buffer-valikko buffer-menu)
-(infomap tapa-aukioleva-buffer kill-this-buffer)
-(helpmap buffer-valikko buffer-menu)
-(helpmap tapa-aukioleva-buffer kill-this-buffer)
-(infomap seuraava-buffer switch-to-next-buffer)
-(infomap edellinen-buffer switch-to-prev-buffer)
-(helpmap seuraava-buffer switch-to-next-buffer)
-(helpmap edellinen-buffer switch-to-prev-buffer)
+(infomap buffer-valikko 'buffer-menu)
+(infomap tapa-aukioleva-buffer 'kill-this-buffer)
+(helpmap buffer-valikko 'buffer-menu)
+(helpmap tapa-aukioleva-buffer 'kill-this-buffer)
+(infomap seuraava-buffer 'switch-to-next-buffer)
+(infomap edellinen-buffer 'switch-to-prev-buffer)
+(helpmap seuraava-buffer 'switch-to-next-buffer)
+(helpmap edellinen-buffer 'switch-to-prev-buffer)
 
 #+END_SRC 
 * Minibuffer
@@ -846,13 +1130,108 @@ Näppäinyhdistelmissä käytettävät muuttujat löytyvät osiosta Globaalit mu
 
 
 #+END_SRC
-* Ivy 
-Ivylle tarkoitetut asetukset tähän.
+* Ibuffer
+Ibuffer kytketään päälle buffer-valikko-muuttujan avulla.
+** Järjestely
+Bufferit voidaan järjestellä Ibufferissa valutun teeman mukaan.
 #+BEGIN_SRC emacs-lisp
 
-(ivy-mode 1)
-(setq ivy-use-virtual-buffers t)
-(setq enable-recursive-minibuffers t)
+  (setq ibuffer-saved-filter-groups
+	(quote
+	 (("default"
+	   ("Konfigurointi" (or
+			     (name . "^emacs.org$")
+			     (name . "^\\*scratch\\*$")))
+	   ("Gradu" (or
+		     (name . "gradu*")))
+	   ("Python" (or
+		      (name . "*.py$")
+		      (mode . python-mode)))
+	   ("R" (or
+		 (name . "*.r$")
+		 (name . "*.R$")))
+	   ("Dired-kansiot" (mode . dired-mode))))))
+
+  (add-hook 'ibuffer-mode-hook
+		(lambda ()
+		  (ibuffer-switch-to-saved-filter-groups "default")))
+
+
+#+END_SRC 
+
+* Ivy 
+Ivylle tarkoitetut asetukset tähän. Counsel on työkalu, joka ajaa Helmin tukemat asiat.
+** Ivy
+#+BEGIN_SRC emacs-lisp
+
+  (ivy-mode 1)
+  (setq ivy-use-virtual-buffers t)
+  (setq enable-recursive-minibuffers t)
+
+#+END_SRC 
+
+** Swiper
+Korvaa Emacsin oletushaku Swiperilla.
+
+#+name: swiper-taulu
+| Näppäinyhdistelmä | Funktio |
+|-------------------+---------|
+| C-s               | 'swiper |
+#+BEGIN_SRC emacs-lisp :exports code :var swiper-taulu=swiper-taulu
+(taulukko-eval 'evil/n swiper-taulu t)
+#+end_SRC
+
+#+RESULTS:
+| C-s | 'swiper |
+
+** Counsel
+*** Kytke päälle
+#+BEGIN_SRC emacs-lisp
+
+(require 'counsel)
+(counsel-mode 1)
+
+#+END_SRC 
+
+*** Autocompletion
+Counsel-company tarjoaa mahdollisuuden etsiä vaihtoehtoja joukosta.
+#+name: counsel-autokompleetio
+| Näppäinyhdistelmä | Funktio          |
+|-------------------+------------------|
+| åd                | 'counsel-company |
+#+BEGIN_SRC emacs-lisp :exports code :var counsel-autokompleetio=counsel-autokompleetio
+(taulukko-eval 'evil/i counsel-autokompleetio t)
+#+end_SRC
+
+#+RESULTS:
+| åd | 'counsel-company |
+
+* Helm
+Helm on yhtenäinen standardi, jonka avulla voi hakea melkein kaikenlaista. Otettu toistaiseksi pois käytöstä muussa kuin Googlehaussa.
+
+#+BEGIN_SRC emacs-lisp
+
+  (require 'helm)
+  ;; (helm-mode 1)
+
+  ;; (defmacro helmmap (key func)
+  ;;     `(define-key helm-map (kbd ,key) (quote ,func)))
+
+  ;; (helmmap "C-j" helm-next-line)
+  ;; (evil/n buffer-valikko helm-buffers-list)
+  ;; (helmmap "C-u" helm-find-files-up-one-level)
+
+#+END_SRC 
+
+* Yasnippets
+Tähän liittyvät asetukset, muut kuin pikanäppäimet snippettien luomiselle.
+** Varoitukset
+Lähtökohtaisesti Emacs varoittaa, kun buffer muokkaa backquote-merkkien sisällä
+olevaa lausetta (backquote-merkkien sisälle tulee Elisp-funktiot, jotka
+evaluoidaan). Kytke tässä varoitus pois päältä.
+#+BEGIN_SRC emacs-lisp
+
+(add-to-list 'warning-suppress-types '(yasnippet backquote-change))
 
 #+END_SRC 
 
@@ -902,8 +1281,9 @@ Package Menu moodin asetukset
   (packmap "l" forward-char)
   (packmap poista-muut-ikkunat delete-other-windows)
   (packmap poista-aktiivinen-ikkuna delete-window)
+  (packmap "'" evil-search-forward)
+  (packmap "+" evil-search-backward)
 
-  (add-hook 'package-menu-mode-hook (lambda () (evil-mode)))
 
 #+END_SRC 
 
@@ -917,6 +1297,77 @@ Package Menu moodin asetukset
 
 * Git / Magit
 Magit-pikanäppäimet löytyvät Evil-mode-valikon alta.
+** Commit-editointi
+#+BEGIN_SRC emacs-lisp
+(require 'with-editor)
+(define-key with-editor-mode-map "ås" 'with-editor-finish)
+
+#+END_SRC 
+** Stage
+Miten stageus-vaihe tapahtuu.
+
+#+BEGIN_SRC emacs-lisp
+
+(evil/n "ågta" 'magit-stage-modified) ; Stageta kaikki
+(evil/n "ågtt" 'magit-stage) ; Stageta aukioleva tiedosto
+(evil/n "ågtf" 'magit-stage-file) ; Stageta mielivaltainen tiedosto
+
+#+END_SRC 
+
+** Commit
+Tee commit.
+
+#+BEGIN_SRC emacs-lisp
+
+(evil/n "ågc" 'magit-commit-popup)
+
+#+END_SRC 
+
+** Push/pull
+Työnnä ja vedä Githubista tai tee vastaavaa jonkun muun
+branchin kanssa.
+
+#+name: pushpull
+| Näppäinyhdistelmä | Funktio                         |
+|-------------------+---------------------------------|
+| ågpsh             | 'magit-push-current-to-upstream |
+| ågpsb             | 'magit-push                     |
+| ågplh             | 'magit-pull-from-upstream       |
+| ågplb             | 'magit-pull                     |
+
+#+BEGIN_SRC emacs-lisp :exports code :var pushpull=pushpull
+
+  ;; (evil/n "ågpsh" 'magit-push-current-to-upstream)
+  ;; (evil/n "ågpsb" 'magit-push)
+  ;; (evil/n "ågplh" 'magit-pull-from-upstream)
+  ;; (evil/n "ågplb" 'magit-pull)
+
+  ;; (mapc (lambda (x) (lue-merkki-pari x 'evil/n t)) pushpull)
+  (dolist (i pushpull)
+    (lue-merkki-pari i 'evil/n t))
+#+END_SRC 
+
+#+RESULTS:
+
+** Evil-näppäimet
+#+BEGIN_SRC emacs-lisp
+
+(require 'evil-magit)
+
+#+END_SRC 
+
+* Helm
+Helm on kykenevä etsintätyökalu. "M-x" on varattu toistaiseksi
+paketin omalle funktiovalikolle, laita tänne muita juttuja.
+** Google-haku
+Hae google-tuloksia nopeasti.
+
+#+BEGIN_SRC emacs-lisp
+
+(evil/n "åqg" 'helm-google)
+
+#+END_SRC 
+
 * Elfeed
 Newsfeed Emacsin sisällä. Tee tänne asetukset sen varalta. Itse newsfeedit tulevat tiedostoon [[file:/Users/tommi/.emacs.d/elfeed.org][elfeed.org]].
 ** Elfeed-org
@@ -944,7 +1395,33 @@ Aseta org-tiedosto, jossa voi hallita kaikkia seurattavia feedejä helposti.
 
 #+END_SRC 
 
-* which-key
+* Regexp Builder
+Rakenna säännöllisiä lausekkeita minibufferissa ja käytä niitä hyödyksi.
+** Säännöllisten lausekkeiden rakentaminen
+Shortcutti, jonka avulla saadaan äkkiä kaksi takakenoviivaa.
+#+name: lisää-regex
+| Näppäinyhdistelmä | Lopputulos        |
+|-------------------+-------------------|
+| åk                | (kirjoita "\\\\") |
+#+BEGIN_SRC emacs-lisp :exports code :var lisää-regex=lisää-regex
+  (taulukko-eval 'evil/i lisää-regex t)
+#+end_SRC
+
+#+RESULTS:
+| åk | (kirjoita "\\\\") |
+
+** Pikanäppäimet
+#+BEGIN_SRC emacs-lisp :exports code 
+  (defun regexp-kartta (key func)
+    `(evil-define-key 'normal reb-mode-map (kbd ,key) ,func)) 
+
+  (regexp-kartta "öä" 'reb-quit)
+  (regexp-kartta "åf" (lambda () (message "Heihou letsgou!")))
+
+  ;;(taulukko-eval 'regexp-kartta regexpit t)
+#+end_SRC
+
+* whch-key
 Näytä popup-valikossa saatavilla olevat näppäinyhdistelmät.
 ** Aseta päälle
 #+BEGIN_SRC emacs-lisp
@@ -955,10 +1432,47 @@ Näytä popup-valikossa saatavilla olevat näppäinyhdistelmät.
 ** Kustomoi ohjeistusta
 Sen sijaan, että which-key näyttää popup-valikossa funktioiden nimet, se voi näyttää 
 ohjeeen siitä, mitä painike tekee.
-
+*** Makro
 #+BEGIN_SRC emacs-lisp
 
   (defalias 'whichmajor 'which-key-add-major-mode-key-based-replacements)
+  (defalias 'whichcommon 'which-key-add-key-based-replacements)
+
+#+END_SRC
+
+*** Yleiset
+Gitiin liittyvät asetukset Magit-osiossa.
+
+#+NAME: yleinen-which
+| Yhdistelmä | Kuvaus                  |
+|------------+-------------------------|
+| ås         | Tallenna                |
+| åhf        | Katso funktio           |
+| åhk        | Katso näppäinyhdistelmä |
+| åhv        | Katso globaali muuttuja |
+| ånm        | Uusi kirjanmerkki       |
+| åns        | Uusi koodisnippet       |
+| åv         | Katso agenda            |
+
+#+BEGIN_SRC emacs-lisp :exports code :var data=yleinen-which
+
+  (mapc (lambda (x) (whichcommon (car x) (cadr x))) data)
+
+  ;; (whichcommon 
+    ;; "ås" "Tallenna"
+    ;; "åhf" "Katso funktio"
+    ;; "åhk" "Katso näppäinyhdistelmä"
+    ;; "åhv" "Katso globaali muuttuja"
+    ;; "ånm" "Uusi kirjanmerkki"
+    ;; "åns" "Uusi koodisnippet"
+    ;; "åv" "Katso agenda"
+    ;; )
+
+#+END_SRC 
+
+*** Org
+
+#+BEGIN_SRC emacs-lisp
 
   (whichmajor 'org-mode
     "ta" "Ajanhallinta"
@@ -971,6 +1485,30 @@ ohjeeen siitä, mitä painike tekee.
     "tls" "Sorttaa taulukko"
     "to" "Avaa linkki"
     "ts" "Muokkaa koodia"
+    "tt" "Aseta tägi"
+    )
+
+#+END_SRC 
+
+*** Magit
+
+#+BEGIN_SRC emacs-lisp
+
+  (whichcommon 
+    "åg" "Git/Magit"
+    "ågc" "Git commit"
+    "ågs" "Git status"
+    "ågt" "Git stage/add"
+    "ågta" "Stageta kaikki seurattavat"
+    "ågtt" "Stageta aukioleva tiedosto"
+    "ågtf" "Stageta haluttu tiedosto"
+    "ågp" "Push/pull"
+    "ågps" "Git push"
+    "ågpl" "Git pull"
+    "ågpsh" "Työnnä Githubiin tms"
+    "ågpsb" "Työnnä haluttuun branchiin"
+    "ågplh" "Vedä Githubista tms"
+    "ågplb" "Vedä halutusta branchista"
     )
 
 #+END_SRC 
@@ -1004,25 +1542,45 @@ Tämä ei ota onnistukaseen vielä. Käytä M-up, M-down -komentoja.
 
 #+BEGIN_SRC emacs-lisp
 
-  (evil/i "¨d" (insert "$"))
-  (evil/i "¨." (insert "¨"))
-  (evil/i "¨a" (insert "@"))
-  (evil/i "¨f" (insert "\\"))
-  (evil/i "¨c" (insert "{}"))
-  (evil/i "¨q" (insert "\"\""))
+  ;; (evil/i "¨d" (kirjoita "$"))
+  ;; (evil/i "¨." (kirjoita "¨"))
+  ;; (evil/i "¨a" (kirjoita "@"))
+  ;; (evil/i "¨f" (kirjoita "\\"))
+  ;; (evil/i "¨c" (kirjoita "{}"))
+  ;; (evil/i "¨q" (kirjoita "\"\""))
 
 #+END_SRC 
-
 * Laskin / calc
 Emacsin oman laskimen asetukset.
-** Pikanäppäin
+** Pikalaskin
 
 #+BEGIN_SRC emacs-lisp
 
   (setq laskin-painike "åc")
 
-  (evil/n laskin-painike calc)
-  (evil/i laskin-painike (calc))
+  (evil/n laskin-painike 'quick-calc)
+  (evil/i laskin-painike 'quick-calc)
+
+#+END_SRC 
+
+** Laskin
+Ota superlaskin / köyhän miehen Mathematica käyttöön
+*** Pikanäppäin
+#+BEGIN_SRC emacs-lisp
+
+  (evil/n "åqc" 'calc)
+
+#+END_SRC 
+
+*** Ikkunat
+#+BEGIN_SRC emacs-lisp
+  (require 'calc)
+  ;; (defmacro calcmap (key func)
+  ;;     `(define-key calc-mode-map (kbd ,key) (quote ,func)))
+
+  (def-avain calcmap calc-mode-map)
+
+  (calcmap "öö" 'ace-window)
 
 #+END_SRC 
 
@@ -1032,17 +1590,28 @@ Selainasetukset tähän. Tämä ei toimi kunnolla, koska w3m ei asentunut oikein
 
 #+BEGIN_SRC emacs-lisp
 
-(setq browse-url-browser-function 'w3m-browse-url)
-(autoload 'w3m-browse-url "w3m" "Pyydä www-selainta näyttämään URL." t)
+  ;; (setq browse-url-browser-function 'w3m-browse-url)
+  ;; (autoload 'w3m-browse-url "w3m" "Pyydä www-selainta näyttämään URL." t)
 
 #+END_SRC 
 
 * Leikkikenttä
 Laita tänne kaikkea höpsöttelyä.
+#+name: sitaattimerkit
+| Yhdistelmä | Funktio               |
+|------------+-----------------------|
+| ågg        | (kirjoita "Häppärää") |
+#+BEGIN_SRC emacs-lisp :exports code :var sitaattimerkit=sitaattimerkit
+(taulukko-eval 'evil/i sitaattimerkit t)
+#+end_SRC
+
+#+RESULTS:
+| ågg | (kirjoita "Häppärää") |
+
 
 #+BEGIN_SRC emacs-lisp
 (message "Heihou")
 #+END_SRC 
-
+Lasketaan yhteen: 8.0
 <2018-06-20 Ke>
 <2018-06-21 To>
