@@ -866,6 +866,35 @@ Tähän Python-shellin komennot
 
 #+END_SRC 
 
+** Virtuaaliympäristöt
+*** Conda-ympäristöt
+#+BEGIN_SRC emacs-lisp
+  (require 'virtualenvwrapper)
+  (venv-initialize-interactive-shells) ;; if you want interactive shell support
+  (venv-initialize-eshell)
+
+  (setenv "WORKON_HOME" "/Applications/anaconda3/envs")
+  (pyvenv-mode 1)
+  (pyvenv-tracking-mode 1)
+  (setq venv-location "/Applications/anaconda3/envs")
+#+END_SRC 
+
+*** Pikanäppäimet
+Funktiot tekevät seuraavia asioita:
+ 1) *venv-workon*: aktivoi haluttu virtuaaliympäristö
+ 2) *venv-deactivate*: deaktivoi virtuaaliympäristö
+ 3) *python*: avaa Python-shell perustuen virtuaaliympäristöön
+#+name: python-kbd
+| Pikanäppäin | Funktio          |
+|-------------+------------------|
+| åpa         | 'venv-workon     |
+| åpd         | 'venv-deactivate |
+| åps         | 'python          |
+
+#+BEGIN_SRC emacs-lisp :exports code :var python-kbd=python-kbd
+(taulukko-eval 'evil/n python-kbd t)
+#+end_SRC
+
 * Elisp / Emacs-Lisp
 ** Makrot
 #+BEGIN_SRC emacs-lisp
@@ -1595,7 +1624,7 @@ Kunnia tästä emacs-fulle (http://emacs-fu.blogspot.com)
 #+BEGIN_SRC emacs-lisp
     (display-battery-mode 1)
 
-    (setq global-mode-string (concat display-time-string ", akkua " battery-mode-line-string "%%]"))
+    ;; (setq global-mode-string (concat display-time-string ", akkua " battery-mode-line-string "%%]"))
   ;;   (setq mode-line-format
   ;; 	(list
   ;; 	 "%b"
@@ -1709,6 +1738,17 @@ Elmacro on työkalu, joka näyttää näppäinmakrot Elisp-funktioina
 (require 'elmacro)
 (elmacro-mode)
 
+#+END_SRC 
+
+* Musiikki
+EMMS vastaa musiikinhallinnasta Emacsilla.
+
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path "~/elisp/emms/")
+  (require 'emms-setup)
+  (emms-all)
+  (emms-default-players)
+  (setq emms-source-file-default-directory "~/Music/Lataukset/")
 #+END_SRC 
 
 * Ikonit
