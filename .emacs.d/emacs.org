@@ -115,7 +115,7 @@ uusiksi kunnolla (24-h ajanotto jne).
 #+BEGIN_SRC emacs-lisp
 
 (display-time-mode 1)
-
+(setq display-time-24hr-format t)
 
 #+END_SRC 
 
@@ -168,31 +168,10 @@ Pistä popup-valikko funktioille pystyyn.
 
 #+END_SRC 
 
-** Statusbar
-Powerline-paketilla alla olevan palkin saa parempaan kuosiin.
-*** Powerline
+** Tallennus
 #+BEGIN_SRC emacs-lisp
 
-(require 'powerline)
-
-#+END_SRC 
-
-*** Teema
-#+BEGIN_SRC emacs-lisp
-
-  (setq powerline-arrow-shape 'curve)
-
-  (custom-set-faces
-   '(mode-line ((t (:foreground "#030303" :background "#bdbdbd" :box nil))))
-   '(mode-line-inactive ((t (:foreground "#f9f9f9" :background "#666666" :box nil)))))
-
-  (set-face-attribute 'mode-line nil
-		      :background "OliveDrab3"
-		      :box nil)
-
-  (setq powerline-color1 "grey22")
-  (setq powerline-color2 "grey40")
-
+(setq-default require-final-newline nil)
 
 #+END_SRC 
 
@@ -353,23 +332,23 @@ Hallitse ikkunoita ja liiku niiden välillä
 Hallitse buffereita ja liiku niiden välillä
 
 #+name: puskurit
-| Näppäinyhdistelmä     | Funktio           |
-|-----------------------+-------------------|
-| tallennus             | 'save-buffer      |
-| buffer-valikko        | 'ibuffer          |
-| tapa-aukioleva-buffer | 'kill-this-buffer |
-| seuraava-buffer       | 'evil-next-buffer |
-| edellinen-buffer      | 'evil-prev-buffer |
+| Näppäinyhdistelmä     | Funktio                 |
+|-----------------------+-------------------------|
+| tallennus             | 'save-buffer            |
+| buffer-valikko        | 'ibuffer                |
+| tapa-aukioleva-buffer | 'sulje-buffer-ja-ikkuna |
+| seuraava-buffer       | 'evil-next-buffer       |
+| edellinen-buffer      | 'evil-prev-buffer       |
 #+BEGIN_SRC emacs-lisp :exports code :var puskurit=puskurit
   (taulukko-eval 'evil/n puskurit nil)
 #+END_SRC 
 
 #+RESULTS:
-| tallennus             | 'save-buffer      |
-| buffer-valikko        | 'ibuffer          |
-| tapa-aukioleva-buffer | 'kill-this-buffer |
-| seuraava-buffer       | 'evil-next-buffer |
-| edellinen-buffer      | 'evil-prev-buffer |
+| tallennus             | 'save-buffer            |
+| buffer-valikko        | 'ibuffer                |
+| tapa-aukioleva-buffer | 'sulje-buffer-ja-ikkuna |
+| seuraava-buffer       | 'evil-next-buffer       |
+| edellinen-buffer      | 'evil-prev-buffer       |
  
 *** Makrot
 Käytä tätä komentoa makron ajamiseen.
@@ -623,7 +602,10 @@ tässä ne kielet, joiden evaluointi mahdollistetaan.
    'org-babel-load-languages
     '((python . t)
       (R . t)
-      (sqlite . t)))
+      (sqlite . t)
+      (C . t)
+      (java . t)
+      (prolog . t)))
 
 #+END_SRC 
 
@@ -821,6 +803,8 @@ Src blockien hallintaan tarkoitetut työkalut tänne.
 
   (evil-define-key 'normal org-src-mode-map (kbd "ts") 'org-edit-src-exit)
   (evil-define-key 'normal org-mode-map (kbd "ts") 'org-edit-special)
+
+  (add-hook 'org-mode-hook (lambda () (interactive)(setq-local require-final-newline nil)))
 #+END_SRC 
 
 * Python
@@ -839,9 +823,11 @@ Aseta hookeja, jotka aktivoituvat samalla kun Python-tila aktivoituu.
 Aseta lähtökohtaisesti toimimaan
 
 #+BEGIN_SRC emacs-lisp
-
-(setq py-smart-indentation t)
-
+  (setq-default indent-tabs-mode t)
+  (setq py-smart-indentation t)
+  ;; (setq org-src-preserve-indentation t)
+  ;; (setq org-src-tab-acts-natively t)
+  (setq tab-width 4)
 #+END_SRC 
 
 ** Elpy
@@ -867,6 +853,16 @@ eroon.
 (setq python-shell-interpreter "/Applications/anaconda3/bin/jupyter")
 ;;    python-shell-interpreter-args "console")
 (setq-default py-which-bufname "IPython")
+
+#+END_SRC 
+
+** Shell-komennot
+Tähän Python-shellin komennot
+#+BEGIN_SRC emacs-lisp
+
+  (add-hook 'py-python-shell-mode-hook (lambda () (interactive)
+					 (evil/i "C-b" 'comint-previous-matching-input-from-input)
+					 (evil/i "C-f" 'comint-next-matching-input-from-input)))
 
 #+END_SRC 
 
@@ -1235,6 +1231,13 @@ evaluoidaan). Kytke tässä varoitus pois päältä.
 
 #+END_SRC 
 
+** Lopeta sisennys / indentointi
+#+BEGIN_SRC emacs-lisp
+
+(setq yas/indent-line nil)
+
+#+END_SRC 
+
 * Search / haku 
 Hakumoodiin tarkoitetut asetukset. Tässä tavalliset Macin näppäinyhdistelmät käytössä, koska haku-toiminnot eivät hyväksy
 prefix-näppäimiksi muita kuin Ctrl, Alt jne.
@@ -1421,6 +1424,29 @@ Shortcutti, jonka avulla saadaan äkkiä kaksi takakenoviivaa.
   ;;(taulukko-eval 'regexp-kartta regexpit t)
 #+end_SRC
 
+** Kustomoidut regexpit
+Tähän omat säännölliset lausekkeet
+#+name: omat-regexpit
+| Lauseke                                                                                   | Haettava pattern |
+|-------------------------------------------------------------------------------------------+------------------|
+| ^\\(\\[\\)[0-9a-z;.\s\\[\\]\\{1,\\}\\(\\]\\[\\)?\\(\\]\\*\\[\\)?[0-9a-z;.\s]*\\(\\]\\)'?$ | 're-matriisi     |
+|                                                                                           |                  |
+#+BEGIN_SRC emacs-lisp :exports code :var omat-regexpit=omat-regexpit
+  ;; (taulukko-eval 'aseta omat-regexpit t)
+#+end_SRC
+
+* Google Translate
+#+BEGIN_SRC emacs-lisp
+
+(require 'google-translate)
+(require 'google-translate-default-ui)
+(evil/n "åqt" 'google-translate-query-translate)
+(evil/n "åql" 'google-translate-at-point)
+
+#+END_SRC 
+
+#+RESULTS:
+: google-translate-at-point
 * whch-key
 Näytä popup-valikossa saatavilla olevat näppäinyhdistelmät.
 ** Aseta päälle
@@ -1512,6 +1538,168 @@ Gitiin liittyvät asetukset Magit-osiossa.
     )
 
 #+END_SRC 
+*** Queryt
+#+name: queryt
+| Yhdistelmä | Kuvaus                        |
+|------------+-------------------------------|
+| åq         | Tee query                     |
+| åqt        | Käännä lause                  |
+| åql        | Käännä sana kursorin kohdalla |
+| åqc        | Emacs laskin                  |
+| åqg        | Google-haku                   |
+
+#+BEGIN_SRC emacs-lisp :exports code :var queryt=queryt
+
+(mapc (lambda (x) (whichcommon (car x) (cadr x))) queryt)
+
+#+END_SRC 
+
+#+RESULTS:
+| åq  | Tee query                     |
+| åqt | Käännä lause                  |
+| åql | Käännä sana kursorin kohdalla |
+| åqc | Emacs laskin                  |
+| åqg | Google-haku                   |
+
+* Statusbar
+Powerline-paketilla alla olevan palkin saa parempaan kuosiin.
+** Powerline
+#+BEGIN_SRC emacs-lisp
+
+  (require 'powerline)
+
+#+END_SRC 
+
+** Teema
+#+BEGIN_SRC emacs-lisp
+  ;; (powerline-center-evil-theme)
+
+  ;; (setq powerline-arrow-shape 'curve)
+
+  ;; (custom-set-faces
+   ;; '(mode-line ((t (:foreground "#030303" :background "#bdbdbd" :box nil))))
+   ;; '(mode-line-inactive ((t (:foreground "#f9f9f9" :background "#666666" :box nil)))))
+
+  (set-face-attribute 'mode-line nil
+		      :background "#660066"
+		      :box nil)
+
+  ;; (setq powerline-color1 "grey22")
+  ;; (setq powerline-color2 "grey40")
+
+
+#+END_SRC 
+
+** Omat informaatiot
+Kunnia tästä emacs-fulle (http://emacs-fu.blogspot.com)
+#+BEGIN_SRC emacs-lisp
+    (display-battery-mode 1)
+
+    (setq global-mode-string (concat display-time-string ", akkua " battery-mode-line-string "%%]"))
+  ;;   (setq mode-line-format
+  ;; 	(list
+  ;; 	 "%b"
+  ;; 	 " --- "
+  ;; 	 "%m: "
+  ;; 	 " --- "
+  ;; 	 "rivi %l "
+  ;; 	 " --- "
+  ;; 	 "klo %M"
+  ;; 	 ))
+  (defun meitsin-status-bar ()
+  "Tämä näkyy bufferin alalaidassa."  
+  (interactive)
+  ;; Vaihda ensin taustaväri purppuraiseksi.
+  (set-face-attribute 'mode-line nil
+		      :background "#660066"
+		      :foreground "White"
+		      :box nil)
+  ;; Hoida tämän jälkeen itse informaatioiden asettelu kuntoon.
+  (setq mode-line-format
+    (list
+      ;; the buffer name; the file name as a tool tip
+      '(:eval (propertize "%b " 'face 'font-lock-keyword-face
+	  'help-echo (buffer-file-name)))
+
+      ;; line and column
+      "(" ;; '%02' to set to 2 chars at least; prevents flickering
+	(propertize "%02l" 'face 'font-lock-type-face) ","
+	(propertize "%02c" 'face 'font-lock-type-face) 
+      ") "
+
+      ;; relative position, size of file
+      "["
+      (propertize "%p" 'face 'font-lock-comment-face) ;; % above top
+      "/"
+      (propertize "%I" 'face 'font-lock-comment-face) ;; size
+      "] "
+
+      ;; the current major mode for the buffer.
+      "["
+
+      '(:eval (propertize "%m" 'face 'font-lock-string-face
+		'help-echo buffer-file-coding-system))
+      "] "
+
+      '(:eval (propertize (concat (format-time-string "%a, %d.%m.%Y") ", klo " (format-time-string "%H:%M"))
+		'help-echo
+		(concat (format-time-string "%c; ")
+			(emacs-uptime "Uptime:%hh"))))
+
+
+      "[" ;; insert vs overwrite mode, input-method in a tooltip
+      '(:eval (propertize (if overwrite-mode "Ovr" "Ins")
+		'face 'font-lock-preprocessor-face
+		'help-echo (concat "Buffer is in "
+			     (if overwrite-mode "overwrite" "insert") " mode")))
+
+      ;; was this buffer modified since the last save?
+      '(:eval (when (buffer-modified-p)
+		(concat ","  (propertize "Mod"
+			       'face 'font-lock-warning-face
+			       'help-echo "Buffer has been modified"))))
+
+      ;; is this buffer read-only?
+      '(:eval (when buffer-read-only
+		(concat ","  (propertize "RO"
+			       'face 'font-lock-type-face
+			       'help-echo "Buffer is read-only"))))  
+      "] "
+
+      ;; add the time, with the date and the emacs uptime in the tooltip
+      " --"
+      ;; i don't want to see minor-modes; but if you want, uncomment this:
+      ;; minor-mode-alist  ;; list of minor modes
+      "%-" ;; fill with '-'
+      )))
+
+
+
+#+END_SRC 
+
+** Minor mode palkille
+Tämän minor moden ansiosta kustomoitu palkki näkyy kaikissa buffereissa. Tässä on monta vaihetta, mutta peruslogiikka
+on seuraava:
+ 1) Luo ensin oma minor mode
+ 2) Määrittele hook, eli mikä funktio ajetaan kun mode kytketään päälle
+ 3) Luo minor modesta globaali versio, joka aktivoituna pysyy kaikissa buffereissa
+ 4) Kytke globaali minor mode päälle, ja voilà!
+
+_Noppitieto_: palkki-mode on meikäläisen ensimmäinen oma minor mode (luotu Su, 8.7.2018 n. klo 12:00)
+#+BEGIN_SRC emacs-lisp
+  (define-minor-mode palkki-mode
+    "Näytä kustomoitu statusbar."
+    :lighter "Palkki"
+    :init-value nil
+    )
+
+  (add-hook 'palkki-mode-hook 'meitsin-status-bar)
+  
+  (define-global-minor-mode palkki-global-mode palkki-mode
+    (lambda ()(interactive)(palkki-mode 1)))
+
+  (palkki-global-mode)
+#+END_SRC 
 
 * Elmacro
 Elmacro on työkalu, joka näyttää näppäinmakrot Elisp-funktioina
@@ -1521,6 +1709,13 @@ Elmacro on työkalu, joka näyttää näppäinmakrot Elisp-funktioina
 (require 'elmacro)
 (elmacro-mode)
 
+#+END_SRC 
+
+* Ikonit
+#+BEGIN_SRC emacs-lisp
+
+  (require 'all-the-icons)
+  (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
 #+END_SRC 
 
 * Eshell
@@ -1534,8 +1729,7 @@ Eshellille tarkoitetut asetukset tulevat tänne
 ** Komentohistorian selaaminen
 Tämä ei ota onnistukaseen vielä. Käytä M-up, M-down -komentoja.
 #+BEGIN_SRC emacs-lisp
-
-;(evil-define-key 'motion eshell-mode-map (kbd "C-ä") 'evil-jump-backwards)
+  (add-hook 'eshell-mode-hook (lambda () (evil/i "C-b" 'eshell-previous-matching-input-from-input)))
 
 #+END_SRC 
 ** Rivin manipulointi
@@ -1550,6 +1744,98 @@ Tämä ei ota onnistukaseen vielä. Käytä M-up, M-down -komentoja.
   ;; (evil/i "¨q" (kirjoita "\"\""))
 
 #+END_SRC 
+** Tyyli
+Kunnia kuuluu ekaschalkille (modernemacs.com)
+*** Makrot
+#+BEGIN_SRC emacs-lisp
+
+(require 'dash)
+(require 's)
+
+(defmacro with-face (STR &rest PROPS)
+  "Return STR propertized with PROPS."
+  `(propertize ,STR 'face (list ,@PROPS)))
+
+(defmacro esh-section (NAME ICON FORM &rest PROPS)
+  "Build eshell section NAME with ICON prepended to evaled FORM with PROPS."
+  `(setq ,NAME
+         (lambda () (when ,FORM
+                 (-> ,ICON
+                    (concat esh-section-delim ,FORM)
+                    (with-face ,@PROPS))))))
+
+(defun esh-acc (acc x)
+  "Accumulator for evaluating and concatenating esh-sections."
+  (--if-let (funcall x)
+      (if (s-blank? acc)
+          it
+        (concat acc esh-sep it))
+    acc))
+
+(defun esh-prompt-func ()
+  "Build `eshell-prompt-function'"
+  (concat esh-header
+          (-reduce-from 'esh-acc "" eshell-funcs)
+          "\n"
+          eshell-prompt-string))
+
+#+end_src
+
+*** Kustomointi
+
+#+begin_src emacs-lisp
+(esh-section esh-dir
+             "\xf07c"  ;  (faicon folder)
+             (abbreviate-file-name (eshell/pwd))
+             '(:foreground "gold" :bold ultra-bold :underline t))
+
+(esh-section esh-git
+             "\xe907"  ;  (git icon)
+             (magit-get-current-branch)
+             '(:foreground "pink"))
+
+(esh-section esh-python
+             "\xe928"  ;  (python icon)
+             pyvenv-virtual-env-name)
+
+(esh-section esh-clock
+             "\xf017"  ;  (clock icon)
+             (format-time-string "%H:%M" (current-time))
+             '(:foreground "forest green"))
+
+;; Below I implement a "prompt number" section
+(setq esh-prompt-num 0)
+(add-hook 'eshell-exit-hook (lambda () (setq esh-prompt-num 0)))
+(advice-add 'eshell-send-input :before
+            (lambda (&rest args) (setq esh-prompt-num (incf esh-prompt-num))))
+
+(esh-section esh-num
+             "\xf0c9"  ;  (list icon)
+             (number-to-string esh-prompt-num)
+             '(:foreground "brown"))
+
+;; Separator between esh-sections
+(setq esh-sep " | ")  ; or "   "
+
+;; Separator between an esh-section icon and form
+(setq esh-section-delim " ")
+
+;; Eshell prompt header
+(setq esh-header "\n ")  ; or "\n┌─"
+
+;; Eshell prompt regexp and string. Unless you are varying the prompt by eg.
+;; your login, these can be the same.
+(setq eshell-prompt-regexp " ")   ; or "└─> "
+(setq eshell-prompt-string " ")   ; or "└─> "
+
+;; Choose which eshell-funcs to enable
+(setq eshell-funcs (list esh-dir esh-git esh-python esh-clock esh-num))
+
+;; Enable the new eshell prompt
+(setq eshell-prompt-function 'esh-prompt-func)
+
+#+END_SRC 
+
 * Laskin / calc
 Emacsin oman laskimen asetukset.
 ** Pikalaskin
@@ -1615,3 +1901,20 @@ Laita tänne kaikkea höpsöttelyä.
 Lasketaan yhteen: 8.0
 <2018-06-20 Ke>
 <2018-06-21 To>
+
+#+BEGIN_SRC emacs-lisp
+
+  ;; (setq mode-line-format
+  ;; 	(list
+  ;; 	 "%b"
+  ;; 	 " --- "
+  ;; 	 "%m: "
+  ;; 	 " --- "
+  ;; 	 "rivi %l "
+  ;; 	 " --- "
+  ;; 	 "klo %M"
+  ;; 	 ))
+
+
+#+END_SRC 
+

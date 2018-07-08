@@ -15,7 +15,13 @@
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (package-initialize)
 
+;; Ido-moodi päälle
+(require 'ido)
+(ido-mode t)
 
+;; Laita oletuksena Vim-näppäimet
+(require 'evil)
+(evil-mode 1)
 ;; Tähän customoidut komennot
 
 (add-to-list 'exec-path "/Users/tommi/.local/bin")
@@ -31,11 +37,7 @@
 (load "erikoismerkit.el")
 
 
-;; Laita oletuksena Vim-näppäimet (require 'evil) (evil-mode 1)
 
-;; Ido-moodi päälle
-(require 'ido)
-(ido-mode t)
 
 (require 'virtualenv)
 
@@ -87,7 +89,8 @@
     ("http://johnhcochrane.blogspot.com/feeds/posts/default/" "http://noahpinionblog.blogspot.com" "http://noahpinionblog.blogspot.com/" "http://johnhcochrane.blogspot.com/" "http://newmonetarism.blogspot.com/")))
  '(package-selected-packages
    (quote
-    (flx ivy-youtube ido-vertical-mode 0blayout company general elisp-def ido-at-point counsel eclipse-theme w3m evil-magit helm-google helm-youtube helm which-key powerline-evil ivy elmacro smex elfeed-org elfeed ox-reveal org hydra bog gandalf-theme python-cell magit org-bullets suggest smartparens flycheck exec-path-from-shell jedi-direx virtualenv elpy python-mode auto-virtualenv jedi anaconda-mode yasnippet matlab-mode ess ace-window darcula-theme geeknote dracula-theme google-maps evil))))
+    (ob-prolog all-the-icons-dired all-the-icons google-translate flx ivy-youtube ido-vertical-mode 0blayout company general elisp-def ido-at-point counsel eclipse-theme w3m evil-magit helm-google helm-youtube helm which-key powerline-evil ivy elmacro smex elfeed-org elfeed ox-reveal org hydra bog gandalf-theme python-cell magit org-bullets suggest smartparens flycheck exec-path-from-shell jedi-direx virtualenv elpy python-mode auto-virtualenv jedi anaconda-mode yasnippet matlab-mode ess ace-window darcula-theme geeknote dracula-theme google-maps evil)))
+ '(safe-local-variable-values (quote ((org-src-preserve-indentation . t)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
