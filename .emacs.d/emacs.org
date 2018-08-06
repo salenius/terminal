@@ -22,17 +22,16 @@ Aseta kieli siten, että oletuksenomaisesti UTF-8-merkintätapa pätee.
 #+END_SRC 
 ** Käyttäjätiedot
 #+name: user-info
-| Muuttuja                | Arvo               |
-|-------------------------+--------------------|
-| tommisalenius@gmail.com | 'user-mail-address |
-| tommisalenius@gmail.com | 'sähköpostiosoite  |
-#+BEGIN_SRC emacs-lisp :exports code :var user-info=user-info
-;;(taulukko-eval 'meitsin-setq user-info t)
+| Muuttuja         | Arvo                      |
+|------------------+---------------------------|
+| sähköpostiosoite | "tommisalenius@gmail.com" |
+#+BEGIN_SRC emacs-lisp :exports code :var user-info=user-info :results list
+(setq sähköpostiosoite "tommisalenius@gmail.com")
 #+end_SRC
 
 #+RESULTS:
-| tommisalenius@gmail.com | 'user-mail-address |
-| tommisalenius@gmail.com | 'sähköpostiosoite  |
+: - tommisalenius@gmail.com
+
 
 ** Työkalurivi ja valikkorivi
 Piilota työkalurivi oletusarvoisesti. Valikkoriviä ei tarvitse piilottaa, koska
@@ -200,8 +199,8 @@ riittämättömiä. _Pidä tämä osio aina mahdollisimman ylhäällä!_
 
 (setq buffer-valikko "öb")
 (setq tapa-aukioleva-buffer "öä")
-(setq seuraava-buffer "C-j")
-(setq edellinen-buffer "C-k")
+(setq seuraava-buffer "ös")
+(setq edellinen-buffer "öe")
 
 #+END_SRC 
 
@@ -408,16 +407,16 @@ jotka abbrev-mode oikolukee lennosta.
 | Näppäinyhdistelmä | Funktio                    |
 |-------------------+----------------------------|
 | åag               | 'add-global-abbrev         |
-| åam               | 'add-more-abbrev           |
+| åam               | 'add-mode-abbrev           |
 | åaig              | 'inverse-add-global-abbrev |
-| åaim              | 'inverse-add-more-abbrev   |
+| åaim              | 'inverse-add-mode-abbrev   |
 #+BEGIN_SRC emacs-lisp :exports code :var abbrev-taulukko=abbrev-taulukko
 (taulukko-eval 'evil/n abbrev-taulukko t)
 #+end_SRC
 
 #+RESULTS:
 | åag  | 'add-global-abbrev         |
-| åam  | 'add-more-abbrev           |
+| åam  | 'add-mode-abbrev           |
 | åaig | 'inverse-add-global-abbrev |
 | åaim | 'inverse-add-more-abbrev   |
 
@@ -894,6 +893,13 @@ Funktiot tekevät seuraavia asioita:
 #+BEGIN_SRC emacs-lisp :exports code :var python-kbd=python-kbd
 (taulukko-eval 'evil/n python-kbd t)
 #+end_SRC
+
+** Dokumentaatio
+#+BEGIN_SRC emacs-lisp
+
+  (evil-define-key 'normal 'python-mode-map (kbd "åd") 'elpy-goto-definition-other-window)
+
+#+END_SRC 
 
 * Elisp / Emacs-Lisp
 ** Makrot
@@ -1381,6 +1387,19 @@ branchin kanssa.
 
 #+RESULTS:
 
+** Branchien luonti
+Luo ja checkouttaa uusiin brancheihin.
+#+name: git-branch-luonti
+| Näppäinyhdistelmä | Funktio                |
+|-------------------+------------------------|
+| ågbb              | 'magit-branch          |
+| ågbc              | 'magit-branch-checkout |
+| ågbr              | 'magit-branch-rename   |
+| ågo               | 'magit-branch-checkout |
+#+BEGIN_SRC emacs-lisp :exports code :var git-branch-luonti=git-branch-luonti
+  (taulukko-eval 'evil/n git-branch-luonti t)
+#+end_SRC
+
 ** Evil-näppäimet
 #+BEGIN_SRC emacs-lisp
 
@@ -1424,6 +1443,35 @@ Aseta org-tiedosto, jossa voi hallita kaikkia seurattavia feedejä helposti.
     "http://johnhcochrane.blogspot.com/feeds/posts/default/"
     "http://newmonetarism.blogspot.com/feeds/posts/default/"
    ))
+
+#+END_SRC 
+
+* ESS
+R-ohjelmointia varten tarkoitetut asetukset
+** Skriptin ajaminen
+#+BEGIN_SRC emacs-lisp
+  (require 'ess)
+  (defmacro essmap (key func)
+    `(define-key ess-mode-map (kbd ,key) (quote ,func)))
+
+  (essmap "årr" ess-eval-region-or-function-or-paragraph-and-step)
+  (essmap "årl" ess-load-file)
+
+#+END_SRC 
+
+** R-konsoli
+#+BEGIN_SRC emacs-lisp
+
+  (add-hook 'inferior-ess-mode-hook
+      (lambda ()(interactive)
+	    (evil/i "C-b"
+		'comint-previous-matching-input-from-input)
+	    (evil/i "C-f"
+		'comint-next-matching-input-from-input)
+	    ;(define-key inferior-ess-mode-map [\C-x \t]
+		;'comint-dynamic-complete-filename)
+       )
+   )
 
 #+END_SRC 
 
@@ -1476,6 +1524,35 @@ Tähän omat säännölliset lausekkeet
 
 #+RESULTS:
 : google-translate-at-point
+* Company
+Company tarjoaa tekstintäydennystä (autocompletion) lennosta.
+#+BEGIN_SRC emacs-lisp
+
+  (require 'company)
+
+#+END_SRC 
+
+** Väriteema
+#+BEGIN_SRC emacs-lisp
+
+  (custom-set-faces
+       '(company-preview
+	 ((t (:foreground "darkgray" :underline t))))
+       '(company-preview-common
+	 ((t (:inherit company-preview))))
+       '(company-tooltip
+	 ((t (:background "lightgray" :foreground "black"))))
+       '(company-tooltip-selection
+	 ((t (:background "steelblue" :foreground "white"))))
+       '(company-tooltip-common
+	 ((((type x)) (:inherit company-tooltip :weight bold))
+	  (t (:inherit company-tooltip))))
+       '(company-tooltip-common-selection
+	 ((((type x)) (:inherit company-tooltip-selection :weight bold))
+	  (t (:inherit company-tooltip-selection)))))
+
+#+END_SRC 
+
 * whch-key
 Näytä popup-valikossa saatavilla olevat näppäinyhdistelmät.
 ** Aseta päälle
@@ -1510,19 +1587,7 @@ Gitiin liittyvät asetukset Magit-osiossa.
 | åv         | Katso agenda            |
 
 #+BEGIN_SRC emacs-lisp :exports code :var data=yleinen-which
-
   (mapc (lambda (x) (whichcommon (car x) (cadr x))) data)
-
-  ;; (whichcommon 
-    ;; "ås" "Tallenna"
-    ;; "åhf" "Katso funktio"
-    ;; "åhk" "Katso näppäinyhdistelmä"
-    ;; "åhv" "Katso globaali muuttuja"
-    ;; "ånm" "Uusi kirjanmerkki"
-    ;; "åns" "Uusi koodisnippet"
-    ;; "åv" "Katso agenda"
-    ;; )
-
 #+END_SRC 
 
 *** Org
@@ -1546,26 +1611,51 @@ Gitiin liittyvät asetukset Magit-osiossa.
 #+END_SRC 
 
 *** Magit
+#+name: magit-komennot
+| Yhdistelmä | Kuvaus                     |
+|------------+----------------------------|
+| åg         | Git/Magit                  |
+| ågc        | Git commit                 |
+| ågs        | Git status                 |
+| ågt        | Git stage/add              |
+| ågta       | Stageta kaikki seurattavat |
+| ågtt       | Stageta aukioleva tiedosto |
+| ågtf       | Stageta haluttu tiedosto   |
+| ågp        | Push/pull                  |
+| ågps       | Git push                   |
+| ågpl       | Git pull                   |
+| ågpsh      | Työnnä Githubiin tms       |
+| ågpsb      | Työnnä haluttuun branchiin |
+| ågplh      | Vedä Githubista tms        |
+| ågplb      | Vedä halutusta branchista  |
+| ågo        | Checkout/vaihda branchiin  |
+| ågbb       | Katso branchit             |
+| ågbc       | Checkout/vaihda branchiin  |
+| ågbr       | Nimeä branch uudelleen     |
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :exports code :var magit-komennot=magit-komennot
+(mapc (lambda (x) (whichcommon (car x) (cadr x))) magit-komennot)
+#+end_SRC
 
-  (whichcommon 
-    "åg" "Git/Magit"
-    "ågc" "Git commit"
-    "ågs" "Git status"
-    "ågt" "Git stage/add"
-    "ågta" "Stageta kaikki seurattavat"
-    "ågtt" "Stageta aukioleva tiedosto"
-    "ågtf" "Stageta haluttu tiedosto"
-    "ågp" "Push/pull"
-    "ågps" "Git push"
-    "ågpl" "Git pull"
-    "ågpsh" "Työnnä Githubiin tms"
-    "ågpsb" "Työnnä haluttuun branchiin"
-    "ågplh" "Vedä Githubista tms"
-    "ågplb" "Vedä halutusta branchista"
-    )
-
+#+RESULTS:
+| åg    | Git/Magit                  |
+| ågc   | Git commit                 |
+| ågs   | Git status                 |
+| ågt   | Git stage/add              |
+| ågta  | Stageta kaikki seurattavat |
+| ågtt  | Stageta aukioleva tiedosto |
+| ågtf  | Stageta haluttu tiedosto   |
+| ågp   | Push/pull                  |
+| ågps  | Git push                   |
+| ågpl  | Git pull                   |
+| ågpsh | Työnnä Githubiin tms       |
+| ågpsb | Työnnä haluttuun branchiin |
+| ågplh | Vedä Githubista tms        |
+| ågplb | Vedä halutusta branchista  |
+| ågo   | Checkout/vaihda branchiin  |
+| ågbb  | Katso branchit             |
+| ågbc  | Checkout/vaihda branchiin  |
+| ågbr  | Nimeä branch uudelleen     |
 #+END_SRC 
 *** Queryt
 #+name: queryt
@@ -1695,6 +1785,9 @@ Kunnia tästä emacs-fulle (http://emacs-fu.blogspot.com)
 			       'help-echo "Buffer is read-only"))))  
       "] "
 
+      ;; Näytä sen hetkinen Git-branch
+      '(vc-mode vc-mode)
+
       ;; add the time, with the date and the emacs uptime in the tooltip
       " --"
       ;; i don't want to see minor-modes; but if you want, uncomment this:
@@ -1728,6 +1821,24 @@ _Noppitieto_: palkki-mode on meikäläisen ensimmäinen oma minor mode (luotu Su
     (lambda ()(interactive)(palkki-mode 1)))
 
   (palkki-global-mode)
+#+END_SRC 
+
+* SQL
+** Konsoli
+#+BEGIN_SRC emacs-lisp
+
+  (defmacro repl-koukku (moodi)
+    "Aseta MOODIlle, joka käyttää REPLiä eli konsolia bufferissa, peruskoukut."
+    `(add-hook (quote ,moodi)
+	 (lambda ()(interactive)
+	    (evil/i "C-b"
+		'comint-previous-matching-input-from-input)
+	    (evil/i "C-f"
+		    'comint-next-matching-input-from-input))))
+
+  (repl-koukku sql-interactive-mode-hook)
+
+
 #+END_SRC 
 
 * Elmacro
@@ -1876,6 +1987,23 @@ Kunnia kuuluu ekaschalkille (modernemacs.com)
 
 #+END_SRC 
 
+* Isot tiedostot
+#+BEGIN_SRC emacs-lisp
+
+(require 'vlf-setup)
+
+#+END_SRC 
+
+* Clojure
+** Kääntäminen
+#+BEGIN_SRC emacs-lisp
+
+  (evil-define-key 'normal clojure-mode-map (kbd "årr")
+    (lambda () (interactive)(save-buffer)
+      (cider-load-buffer-and-switch-to-repl-buffer)))
+
+#+END_SRC 
+
 * Laskin / calc
 Emacsin oman laskimen asetukset.
 ** Pikalaskin
@@ -1910,6 +2038,25 @@ Ota superlaskin / köyhän miehen Mathematica käyttöön
 
 #+END_SRC 
 
+* Monta kursoria
+** Lataa
+#+BEGIN_SRC emacs-lisp
+
+  (require 'multiple-cursors)
+
+#+END_SRC 
+
+** Pikanäppäimet
+#+name: monikursori
+| Yhdistelmä | Funktio                     |
+|------------+-----------------------------|
+| "C-S-j"    | 'mc/mark-next-like-this     |
+| "C-S-k"    | 'mc/mark-previous-like-this |
+| "C-S-a"    | 'mc/mark-all-like-this      |
+#+BEGIN_SRC emacs-lisp :exports code :var monikursori=monikursori
+  (taulukko-eval 'evil/n monikursori t)
+  (taulukko-eval 'evil/i monikursori t)
+#+end_SRC
 * Internet 
 ** w3m
 Selainasetukset tähän. Tämä ei toimi kunnolla, koska w3m ei asentunut oikein.

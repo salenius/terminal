@@ -27,6 +27,12 @@ export PATH="/Applications/anaconda3/bin:$PATH"
 # Luo Python-konsolin käynnistyessä aktivoituva moduuli
 export PYTHONSTARTUP="$HOME/.pythonrc"
 
+# Java-polku
+export JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk-10.0.1.jdk/Contents/Home"
+
+# R-Studio ohjataan Anacondaan
+export RSTUDIO_WHICH_R='/Applications/anaconda3/bin/R'
+
 # Aseta Golangille polku
 export GOROOT="/usr/local/go"
 export GOPATH="/Users/tommi/Golang"
@@ -109,3 +115,5 @@ function conda_auto_env() {
 }
 
 export PROMPT_COMMAND="conda_auto_env;$PROMPT_COMMAND"
+
+alias dösä='/Users/tommi/Python/Automatisointi/bussiaikataulu.py'
