@@ -20,6 +20,10 @@ Aseta kieli siten, että oletuksenomaisesti UTF-8-merkintätapa pätee.
 
   (setq initial-scratch-message "Toimii")
 #+END_SRC 
+
+#+RESULTS:
+: Toimii
+
 ** Käyttäjätiedot
 #+name: user-info
 | Muuttuja         | Arvo                      |
@@ -31,7 +35,6 @@ Aseta kieli siten, että oletuksenomaisesti UTF-8-merkintätapa pätee.
 
 #+RESULTS:
 : - tommisalenius@gmail.com
-
 
 ** Työkalurivi ja valikkorivi
 Piilota työkalurivi oletusarvoisesti. Valikkoriviä ei tarvitse piilottaa, koska
@@ -53,9 +56,11 @@ avausikkunana.
 
 #+END_SRC 
 ** Rivin highlightaus
+Kytkin tämän pois päältä, koska se usein häiritsee enemmän kuin auttaa
+(esim. smartparens-moden kanssa turhahko).
 #+BEGIN_SRC emacs-lisp
 
-(global-hl-line-mode 1)
+  (global-hl-line-mode nil)
 
 #+END_SRC 
 
@@ -160,11 +165,13 @@ korjaa tämän jälkeen värin heksadesimaalinumeroksi
 Pistä popup-valikko funktioille pystyyn.
 #+BEGIN_SRC emacs-lisp
 
-(require 'company)
+  (require 'company)
+  (setq company-idle-delay 0)
 
-(add-hook 'emacs-lisp-mode-hook 'company-mode)
-(add-hook 'lisp-interactive-mode-hook 'company-mode)
-
+  (add-hook 'emacs-lisp-mode-hook 'company-mode)
+  (add-hook 'lisp-interactive-mode-hook 'company-mode)
+  (add-hook 'python-mode-hook 'company-mode)
+  (add-hook 'ess-mode-hook 'company-mode)
 #+END_SRC 
 
 ** Tallennus
@@ -266,6 +273,7 @@ Evil-mode mahdollistaa Vim-tyyppisten näppäinyhdistelmien käytön.
     (def-avain evil/n evil-normal-state-map)
     (def-avain evil/i evil-insert-state-map)
     (def-avain evil/m evil-motion-state-map)
+    (def-avain evil/v evil-visual-state-map)
 
       ;; (defmacro evil/i (key body)
       ;; `(define-key evil-insert-state-map (kbd ,key) (lambda() (interactive)(,@body))))
@@ -331,23 +339,23 @@ Hallitse ikkunoita ja liiku niiden välillä
 Hallitse buffereita ja liiku niiden välillä
 
 #+name: puskurit
-| Näppäinyhdistelmä     | Funktio                 |
-|-----------------------+-------------------------|
-| tallennus             | 'save-buffer            |
-| buffer-valikko        | 'ibuffer                |
-| tapa-aukioleva-buffer | 'sulje-buffer-ja-ikkuna |
-| seuraava-buffer       | 'evil-next-buffer       |
-| edellinen-buffer      | 'evil-prev-buffer       |
+| Näppäinyhdistelmä     | Funktio           |
+|-----------------------+-------------------|
+| tallennus             | 'save-buffer      |
+| buffer-valikko        | 'ibuffer          |
+| tapa-aukioleva-buffer | 'kill-this-buffer |
+| seuraava-buffer       | 'evil-next-buffer |
+| edellinen-buffer      | 'evil-prev-buffer |
 #+BEGIN_SRC emacs-lisp :exports code :var puskurit=puskurit
   (taulukko-eval 'evil/n puskurit nil)
 #+END_SRC 
 
 #+RESULTS:
-| tallennus             | 'save-buffer            |
-| buffer-valikko        | 'ibuffer                |
-| tapa-aukioleva-buffer | 'sulje-buffer-ja-ikkuna |
-| seuraava-buffer       | 'evil-next-buffer       |
-| edellinen-buffer      | 'evil-prev-buffer       |
+| tallennus             | 'save-buffer      |
+| buffer-valikko        | 'ibuffer          |
+| tapa-aukioleva-buffer | 'kill-this-buffer |
+| seuraava-buffer       | 'evil-next-buffer |
+| edellinen-buffer      | 'evil-prev-buffer |
  
 *** Makrot
 Käytä tätä komentoa makron ajamiseen.
@@ -481,7 +489,7 @@ Avaa kalenteri. Suluissa, koska pikanäppäin osoittaa nykyään laskimeen.
 *** Hookit
 #+BEGIN_SRC emacs-lisp
 
-  (add-hook 'evil-normal-state-entry-hook (lambda () (global-hl-line-mode 1)))
+  ;; (add-hook 'evil-normal-state-entry-hook (lambda () (global-hl-line-mode 1)))
 
 #+END_SRC 
 
@@ -584,11 +592,25 @@ Aseta tagi helposti bulletpointiin
 ** Syntax highlighting
 Ilman tätä org-tiedoston koodiblokeissa ei olisi koodin omaa
 highlightausta.
+Lisää tähän niin että LaTeX-komennot saavan highlightauksen.
+Toistaiseksi ongelma, että font-lockien yritykset eivät toimi omaehtoisille
+avainsanoille. Syy on toistaiseksi tuntematon.
 
 #+BEGIN_SRC emacs-lisp
 
-;;(setq org-src-fontify-natively t)
+  ;;(setq org-src-fontify-natively t)
+  (setq org-highlight-latex-and-related '(latex script entitites)) ;; Highlighttaa kaavat pelkästään
 
+  ;; (add-hook 'org-mode-hook
+	    ;; (lambda ()
+	      ;; (font-lock-add-keywords nil
+				      ;; '(("\\<\\(\\cite\\)" .
+					 ;; font-lock-keyword-face)))))
+
+  ;; (setq latex-avainsanat
+    ;; '(("\\(\\\\cite\\)" . font-lock-keyword-face)))
+
+  ;; (font-lock-add-keywords 'org-mode '(("\\<\\cite\\>" . font-lock-keyword-face)))
 #+END_SRC 
 
 ** Babel-support / koodin ajaminen
@@ -642,6 +664,7 @@ Käytä näitä linkkien hallitsemiseen ja avaamiseen
 #+BEGIN_SRC emacs-lisp
 
   (evil-org "to" org-open-at-point)
+  (evil-org "tb" org-mark-ring-goto)
 
 #+END_SRC 
 
@@ -683,6 +706,17 @@ Laita tähän asetukset, joilla agenda modesta pääsee pois.
 
   (agendamap tapa-aukioleva-buffer org-agenda-exit)
 
+#+END_SRC 
+
+** Latex
+#+BEGIN_SRC emacs-lisp
+  (require 'org-ref)
+  (setq reftex-default-bibliography "/Users/tommi/org/Gradu/sources.bib")
+  (setq org-ref-default-bibliography  "/Users/tommi/org/Gradu/sources.bib")
+  (setq bibtex-completion-pdf-open-function
+    (lambda (fpath)
+      (start-process "open" "*open*" "open" fpath)))
+  (setq org-latex-pdf-process (list "latexmk -shell-escape -bibtex -f -pdf %f"))
 #+END_SRC 
 
 ** Beamer-mode                                                    :slideshow:
@@ -776,6 +810,14 @@ Org-moden taikanappula joka pystyy tekemään useita asiota:
 
 #+END_SRC 
 
+** Viitteet
+Kun kirjoitat org-modella tekstiä, joka käännetään LaTeX-muotoon, käytä tätä
+voidakseksi lisätä linkkejä mahdollisimman helposti.
+#+BEGIN_SRC emacs-lisp
+
+  (evil-org "tr" org-reftex-citation)
+#+END_SRC 
+
 ** Aikataulutus ja timestamp
 *** Aseta stamp
 #+BEGIN_SRC emacs-lisp
@@ -807,6 +849,18 @@ Src blockien hallintaan tarkoitetut työkalut tänne.
 #+END_SRC 
 
 * Python
+** Kieli
+Aseta Python tukemaan Unicodea.
+
+#+BEGIN_SRC emacs-lisp
+
+(setenv "PYTHONIOENCODING" "utf-8")
+
+#+END_SRC 
+
+#+RESULTS:
+: utf-8
+
 ** Hookit
 Aseta hookeja, jotka aktivoituvat samalla kun Python-tila aktivoituu.
 
@@ -837,9 +891,8 @@ Aseta Elpy toimimaan
   (elpy-enable)
   (setq elpy-rpc-backend "/Applications/anaconda3/lib/python3.6/site-packages/")
   (setq elpy-rpc-python-command "/Users/tommi/.emacs.d/.python-environments/default/bin/python3.6")
-  ;;(add-hook 'python-mode-hook 'jedi:ac-setup)
+  (add-hook 'python-mode-hook 'jedi:ac-setup)
   (setq jedi:complete-on-dot t)
-
 #+END_SRC 
 
 ** Terminaali ja tulkki
@@ -945,7 +998,11 @@ Etsi funktioiden dokumentointia.
 ** Sulkeiden tuotanto
 #+BEGIN_SRC emacs-lisp
 
-  (elispmap "C-n" kaarisulkeet)
+  ;; (elispmap "C-n" kaarisulkeet)
+  ;; Ylläoleva turha uuden smartparensin takia
+  (require 'smartparens)
+  (add-hook 'emacs-lisp-mode-hook (lambda ()(interactive)
+				   (smartparens-mode)))
 
 #+END_SRC 
 
@@ -1019,6 +1076,43 @@ Funktioista on tullut turhia koska lisäsin entry-hookit normal- ja insert-tiloi
   ;; (evil/n "i" 'kirjoita-rauhassa)
   ;; (evil/i "C-ö" 'poistu-ja-näytä-rivi)
 
+#+END_SRC 
+
+* Smartparens
+Erilaisten sulkujen ja sitaattien hallintaan.
+#+BEGIN_SRC emacs-lisp
+  (require 'smartparens)
+  (smartparens-global-mode t) ; Kytke moodi päälle globaalisti
+
+#+END_SRC 
+** Sulkujen sisällä liikkuminen
+#+BEGIN_SRC emacs-lisp
+
+  (evil/i "å <SPC>" 'sp-up-sexp)
+#+END_SRC 
+** Yhdistä ja pura sulkuja
+#+name: unite-sulut
+| Näppäinyhdistelmä | Funktio                 |
+|-------------------+-------------------------|
+| åbs               | 'sp-join-sexp           |
+| åbf               | 'sp-forward-slurp-sexp  |
+| åbb               | 'sp-backward-slurp-sexp |
+| åba               | 'sp-add-to-next-sexp    |
+| åbe               | 'sp-forward-barf-sexp   |
+| åbt               | 'sp-backward-barf-sexp  |
+| åbu               | 'sp-unwrap-sexp         |
+#+BEGIN_SRC emacs-lisp :exports code :var unite-sulut=unite-sulut
+(taulukko-eval 'evil/n unite-sulut t)
+#+end_SRC
+** Luo sulkuja
+#+name: sulkujen-luonti
+| Näppäinyhdistelmä | Funktio         |
+|-------------------+-----------------|
+| åbr               | 'sp-wrap-round  |
+| åbc               | 'sp-wrap-curly  |
+| åbs               | 'sp-wrap-square |
+#+BEGIN_SRC emacs-lisp :exports code :var sulkujen-luonti=sulkujen-luonti
+  (taulukko-eval 'evil/v sulkujen-luonti t)
 #+END_SRC 
 
 * Popup
@@ -1135,14 +1229,14 @@ Näppäinyhdistelmissä käytettävät muuttujat löytyvät osiosta Globaalit mu
 
 #+BEGIN_SRC emacs-lisp
 
-(infomap buffer-valikko 'buffer-menu)
-(infomap tapa-aukioleva-buffer 'kill-this-buffer)
-(helpmap buffer-valikko 'buffer-menu)
-(helpmap tapa-aukioleva-buffer 'kill-this-buffer)
-(infomap seuraava-buffer 'switch-to-next-buffer)
-(infomap edellinen-buffer 'switch-to-prev-buffer)
-(helpmap seuraava-buffer 'switch-to-next-buffer)
-(helpmap edellinen-buffer 'switch-to-prev-buffer)
+  (infomap buffer-valikko 'buffer-menu)
+  (infomap tapa-aukioleva-buffer 'kill-this-buffer)
+  (helpmap buffer-valikko 'buffer-menu)
+  (helpmap tapa-aukioleva-buffer 'kill-this-buffer)
+  (infomap seuraava-buffer 'switch-to-next-buffer)
+  (infomap edellinen-buffer 'switch-to-prev-buffer)
+  (helpmap seuraava-buffer 'switch-to-next-buffer)
+  (helpmap edellinen-buffer 'switch-to-prev-buffer)
 
 #+END_SRC 
 * Minibuffer
@@ -1451,6 +1545,7 @@ R-ohjelmointia varten tarkoitetut asetukset
 ** Skriptin ajaminen
 #+BEGIN_SRC emacs-lisp
   (require 'ess)
+  (require 'ess-site)
   (defmacro essmap (key func)
     `(define-key ess-mode-map (kbd ,key) (quote ,func)))
 
@@ -1472,6 +1567,18 @@ R-ohjelmointia varten tarkoitetut asetukset
 		;'comint-dynamic-complete-filename)
        )
    )
+
+#+END_SRC 
+
+** Autocompletion
+#+BEGIN_SRC emacs-lisp
+  (require 'auto-complete)
+  (require 'auto-complete-config)
+  (ac-config-default)
+  (define-key ac-completing-map (kbd "M-h") 'ac-quick-help)
+  (setq ess-use-auto-complete t)
+  (setq ess-first-tab-never-complete 'unless-eol)
+
 
 #+END_SRC 
 
@@ -1680,6 +1787,14 @@ Gitiin liittyvät asetukset Magit-osiossa.
 | åqc | Emacs laskin                  |
 | åqg | Google-haku                   |
 
+* Hiiri
+Poista hiiri käytöstä.
+#+BEGIN_SRC emacs-lisp
+
+(mouse-wheel-mode -1)
+
+#+END_SRC 
+
 * Statusbar
 Powerline-paketilla alla olevan palkin saa parempaan kuosiin.
 ** Powerline
@@ -1851,6 +1966,15 @@ Elmacro on työkalu, joka näyttää näppäinmakrot Elisp-funktioina
 
 #+END_SRC 
 
+* Projectile
+Projektienhallintaan tarkoitettu työkalu.
+#+BEGIN_SRC emacs-lisp
+
+(projectile-mode +1)
+(define-key projectile-mode-map "åpr" 'projectile-command-map)
+
+#+END_SRC 
+
 * Musiikki
 EMMS vastaa musiikinhallinnasta Emacsilla.
 
@@ -1860,6 +1984,29 @@ EMMS vastaa musiikinhallinnasta Emacsilla.
   (emms-all)
   (emms-default-players)
   (setq emms-source-file-default-directory "~/Music/Lataukset/")
+#+END_SRC 
+
+* Compilation-mode
+Moodi, joka tulee esim. LaTeX-kääntämisen lopputuloksena tai kun org-mode käännetään LaTeXiin
+#+BEGIN_SRC emacs-lisp
+
+  (defmacro compile-map (key func)
+    `(define-key compilation-mode-map (kbd ,key) (quote ,func)))
+
+#+END_SRC 
+** Buffer ja ikkunat
+#+BEGIN_SRC emacs-lisp
+
+  (compile-map buffer-valikko 'buffer-menu)
+  (compile-map tapa-aukioleva-buffer 'ido-kill-buffer)
+  (compile-map seuraava-buffer 'switch-to-next-buffer)
+  (compile-map edellinen-buffer 'switch-to-prev-buffer)
+  (compile-map pilko-ikkuna-horisontaalisesti 'split-window-horizontally)
+  (compile-map pilko-ikkuna-vertikaalisesti 'split-window-vertically)
+  (compile-map poista-aktiivinen-ikkuna 'delete-window)
+  (compile-map poista-muut-ikkunat 'delete-other-windows)
+  (compile-map "öö" 'ace-window)
+
 #+END_SRC 
 
 * Ikonit
@@ -1997,10 +2144,48 @@ Kunnia kuuluu ekaschalkille (modernemacs.com)
 * Clojure
 ** Kääntäminen
 #+BEGIN_SRC emacs-lisp
+  (defmacro clojure-key (kbd func)
+   `(evil-define-key 'normal clojure-mode-map (kbd ,kbd) ,func))
+  
+ 
+  (clojure-key "årr" (lambda () (interactive)(save-buffer)
+		       (cider-load-buffer-and-switch-to-repl-buffer)))
 
-  (evil-define-key 'normal clojure-mode-map (kbd "årr")
-    (lambda () (interactive)(save-buffer)
-      (cider-load-buffer-and-switch-to-repl-buffer)))
+  (clojure-key "årl" 'cider-eval-last-sexp)
+
+
+
+
+  ;; (evil-define-key 'normal clojure-mode-map (kbd "årr")
+    ;; (lambda () (interactive)(save-buffer)
+      ;; (cider-load-buffer-and-switch-to-repl-buffer)))
+
+#+END_SRC 
+
+** Näppäimet ja sulut
+#+BEGIN_SRC emacs-lisp
+
+  (add-hook 'clojure-mode-hook
+	    (lambda ()(interactive)
+	      (smartparens-mode t)))
+
+#+END_SRC 
+
+** REPL
+#+BEGIN_SRC emacs-lisp
+
+  (defmacro cider-koukku (moodi)
+    "Aseta MOODIlle, joka käyttää REPLiä eli konsolia bufferissa, peruskoukut."
+    `(add-hook (quote ,moodi)
+	 (lambda ()(interactive)
+	    (evil/i "C-b"
+		'cider-repl-backward-input)
+	    (evil/i "C-f"
+		    'cider-repl-forward-input)
+	    (paredit-mode t)
+	    )))
+
+  (cider-koukku cider-mode-hook)
 
 #+END_SRC 
 
@@ -2105,3 +2290,7 @@ Lasketaan yhteen: 8.0
 
 #+END_SRC 
 
+
+# Local Variables:
+# org-src-preserve-indentation: t
+# End:
