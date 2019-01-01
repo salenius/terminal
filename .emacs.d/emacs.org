@@ -461,6 +461,7 @@ Aseta kirjanmerkkejä liikkuaksesi helposti tiedostojen välillä.
 |-------------------+-----------------|
 | ånm               | 'bookmark-set   |
 | gm                | 'bookmark-jump  |
+| ålm               | 'list-bookmarks |
 #+BEGIN_SRC emacs-lisp :exports code :var kirjanmerkki-evil=kirjanmerkki-evil
 (taulukko-eval 'evil/n kirjanmerkki-evil t)
 #+end_SRC
@@ -509,22 +510,15 @@ näppäinyhdistelmät joilla ne voi tehdä käyttäjän ollessa Insert-modessa.
 
 #+BEGIN_SRC emacs-lisp
 
-  ;; (defmacro evil/i (key body)
-  ;;  `(define-key evil-insert-state-map (kbd ,key) (lambda() (interactive)(,@body))))
-
-
   (define-key evil-insert-state-map (kbd "åå") 'evil-force-normal-state) ; Poistu insert-modesta normal-modeen
   (evil/i "¨d" (kirjoita "$"))
   (evil/i "¨." (kirjoita "¨"))
   (evil/i "¨s" (kirjoita "\\"))
   (evil/i "¨q" (kirjoita "\""))
-  (evil/i "¨c" 'aaltosulkeet)
 
   (evil/i "å2" (kirjoita "@"))
   (evil/i "å4" (kirjoita "$"))
   (evil/i "å7" (kirjoita "\\"))
-  (evil/i "å8" (kirjoita "[]"))
-  (evil/i "å9" (kirjoita "{}"))
   (evil/i "åi" (kirjoita "|"))
   (evil/i "å." (kirjoita "å"))
   
@@ -888,11 +882,15 @@ Aseta Elpy toimimaan
 
 #+BEGIN_SRC emacs-lisp
 
-  (elpy-enable)
-  (setq elpy-rpc-backend "/Applications/anaconda3/lib/python3.6/site-packages/")
-  (setq elpy-rpc-python-command "/Users/tommi/.emacs.d/.python-environments/default/bin/python3.6")
-  (add-hook 'python-mode-hook 'jedi:ac-setup)
-  (setq jedi:complete-on-dot t)
+(elpy-enable)
+(setq elpy-rpc-backend "jedi")
+(setq elpy-rpc-python-command "/Users/tommi/.emacs.d/.python-environments/default/bin/python3.6")
+(add-hook 'python-mode-hook 'jedi:ac-setup)
+(setq jedi:complete-on-dot t)
+(add-hook 'elpy-mode-hook
+(lambda ()
+(set (make-local-variable 'company-backends)
+'((company-dabbrev-code company-yasnippet elpy-company-backend)))))
 #+END_SRC 
 
 ** Terminaali ja tulkki
@@ -950,7 +948,7 @@ Funktiot tekevät seuraavia asioita:
 ** Dokumentaatio
 #+BEGIN_SRC emacs-lisp
 
-  (evil-define-key 'normal 'python-mode-map (kbd "åd") 'elpy-goto-definition-other-window)
+(evil-define-key 'normal 'python-mode-map (kbd "åd") 'elpy-doc)
 
 #+END_SRC 
 
@@ -1081,8 +1079,12 @@ Funktioista on tullut turhia koska lisäsin entry-hookit normal- ja insert-tiloi
 * Smartparens
 Erilaisten sulkujen ja sitaattien hallintaan.
 #+BEGIN_SRC emacs-lisp
-  (require 'smartparens)
-  (smartparens-global-mode t) ; Kytke moodi päälle globaalisti
+(require 'smartparens)
+(smartparens-global-mode t) ; Kytke moodi päälle globaalisti
+(setq show-paren-mode t)
+(setq sp-highlight-pair-overlay nil) ; Poista highlightaus sulkujen sisältä.
+
+(show-paren-mode 1) ; Näytä mätsäävät sulkuparit
 
 #+END_SRC 
 ** Sulkujen sisällä liikkuminen
@@ -1101,6 +1103,7 @@ Erilaisten sulkujen ja sitaattien hallintaan.
 | åbe               | 'sp-forward-barf-sexp   |
 | åbt               | 'sp-backward-barf-sexp  |
 | åbu               | 'sp-unwrap-sexp         |
+| åbk               | 'sp-kill-whole-line     |
 #+BEGIN_SRC emacs-lisp :exports code :var unite-sulut=unite-sulut
 (taulukko-eval 'evil/n unite-sulut t)
 #+end_SRC
@@ -1115,6 +1118,64 @@ Erilaisten sulkujen ja sitaattien hallintaan.
   (taulukko-eval 'evil/v sulkujen-luonti t)
 #+END_SRC 
 
+** Lispit
+Lisp-murteilla usein ' ja `-symbolit vaativat usein, että asetetaan ilman
+vastinparia sulkujen tai symbolin eteen. Alla olevasta kiitos Chris Allenille (bytemyapp).
+#+BEGIN_SRC emacs-lisp
+
+(sp-with-modes sp--lisp-modes
+  ;; disable ', it's the quote character!
+  (sp-local-pair "'" nil :actions nil)
+  ;; also only use the pseudo-quote inside strings where it serve as
+  ;; hyperlink.
+(sp-local-pair "`" "'" :when '(sp-in-string-p)))
+
+#+END_SRC 
+
+** Python
+Pythonissa on kolmen """-merkin yhdistelmiä, jolla saadaan monirivisiä kommentteja.
+
+#+BEGIN_SRC emacs-lisp
+(defun uusi-rivi-ja-sisennä (id action context)
+ (when (eq action 'insert)
+  (newline)
+  (newline)
+  (indent-according-to-mode)
+  (previous-line)
+  (indent-according-to-mode)))
+
+
+(sp-with-modes '(python-mode)
+
+  (sp-local-pair "\"\"\"" "\"\"\"" :post-handlers '(:add uusi-rivi-ja-sisennä)))
+
+#+END_SRC 
+
+** C-kielet
+C-kielten kommenteille tarvitaan seuraavaa:
+
+#+BEGIN_SRC emacs-lisp
+(defun asteriski-kommentti
+  (id action context)
+  (when (eq action insert)
+    (progn
+      (insert "*")
+      (save-excursion
+	(insert "\n")
+	(indent-according-to-mode))
+      (indent-according-to-mode))))
+
+(sp-with-modes '(c-mode c++-mode java-mode javascript-mode)
+
+  (sp-local-pair "/*" "*/" :post-handlers '(:add uusi-rivi-ja-sisennä
+						 (asteriski-kommentti "RET"))))
+
+#+END_SRC 
+
+* Keychord
+Painamalla simultaanisti kahta nappulaa, voit käyttää hyväksi tiettyjä
+erikoisominaisuuksia. Osa näistä ominaisuuksista on tehty käytettäväksi vain
+tietyissä minor modeissa.
 * Popup
 ** Perusasetukset
 En ole saanut tätä skulaamaan vielä ollenkaan. Ota projektiksi.
@@ -1181,64 +1242,6 @@ nimet jne.
 
 #+END_SRC 
 
-* Help- ja Info-mode
-Käytä näitä kun olet info-tilassa (esim. luet Elisp-manuaalia)
-tai olet help-tilassa (haet apua jonkun funktion määrittelyyn esim).
-
-** Makrot
-#+BEGIN_SRC emacs-lisp
-
-(def-avain helpmap help-mode-map)
-(def-avain infomap Info-mode-map)
-
-#+END_SRC 
-
-** Ikkunoiden hallinta
-Liiku ikkunoiden välillä ja sulje niitä. Pyri pitämään nämä samoina kuin Evil-moden
-ikkunoiden hallintatyökalut.
-
-#+BEGIN_SRC emacs-lisp
-
-  ;; (defmacro helpmap (key func)
-  ;;     `(define-key help-mode-map (kbd ,key) (quote ,func)))
-
-  ;; (defmacro infomap (key func)
-  ;;     `(define-key Info-mode-map (kbd ,key) (quote ,func)))
-
-
-  (infomap pilko-ikkuna-horisontaalisesti 'split-window-horizontally)
-  (infomap pilko-ikkuna-vertikaalisesti 'split-window-vertically)
-  (helpmap pilko-ikkuna-horisontaalisesti 'split-window-horizontally)
-  (helpmap pilko-ikkuna-vertikaalisesti 'split-window-vertically)
-
-  ;; (define-key Info-mode-map (kbd "C-ä") 'evil-window-next)
-  (infomap poista-aktiivinen-ikkuna 'delete-window)
-  (infomap poista-muut-ikkunat 'delete-other-windows)
-  ;; (define-key Help-mode-map (kbd "C-ä") 'evil-window-next)
-  (helpmap poista-aktiivinen-ikkuna 'delete-window)
-  (helpmap poista-muut-ikkunat 'delete-other-windows)
-  (helpmap "öö" 'ace-window)
-  (infomap "öö" 'ace-window)
-  ;; evil-window-kommentoitu, koska sen toiminta ei ole taattua tiloissa, joissa
-  ;; Evil-modea ei ole.
-#+END_SRC 
-** Bufferien hallinta
-Hallitse buffereita kuten tekisit normaalien tekstitiedostojen tapauksessa. Pyri
-pitämään nämä synkronoituna tavallisten Evil-moden buffereiden hallintatyökalujen kanssa.
-Näppäinyhdistelmissä käytettävät muuttujat löytyvät osiosta Globaalit muuttujat > Bufferit.
-
-#+BEGIN_SRC emacs-lisp
-
-  (infomap buffer-valikko 'buffer-menu)
-  (infomap tapa-aukioleva-buffer 'kill-this-buffer)
-  (helpmap buffer-valikko 'buffer-menu)
-  (helpmap tapa-aukioleva-buffer 'kill-this-buffer)
-  (infomap seuraava-buffer 'switch-to-next-buffer)
-  (infomap edellinen-buffer 'switch-to-prev-buffer)
-  (helpmap seuraava-buffer 'switch-to-next-buffer)
-  (helpmap edellinen-buffer 'switch-to-prev-buffer)
-
-#+END_SRC 
 * Minibuffer
 ** Näppäinlyhenteet
 
@@ -1544,14 +1547,15 @@ Aseta org-tiedosto, jossa voi hallita kaikkia seurattavia feedejä helposti.
 R-ohjelmointia varten tarkoitetut asetukset
 ** Skriptin ajaminen
 #+BEGIN_SRC emacs-lisp
-  (require 'ess)
-  (require 'ess-site)
-  (defmacro essmap (key func)
-    `(define-key ess-mode-map (kbd ,key) (quote ,func)))
+(require 'ess)
+(require 'ess-site)
+(defmacro essmap (key func)
+  `(define-key ess-mode-map (kbd ,key) (quote ,func)))
 
-  (essmap "årr" ess-eval-region-or-function-or-paragraph-and-step)
-  (essmap "årl" ess-load-file)
+(essmap "årr" ess-eval-region-or-function-or-paragraph-and-step)
+(essmap "årl" ess-load-file)
 
+(setq ess-eval-visibly 'nowait) ; Redditissä suositeltiin tätä https://www.reddit.com/r/emacs/comments/8gr6jt/looking_for_tips_from_r_coders_who_use_ess/
 #+END_SRC 
 
 ** R-konsoli
@@ -1572,13 +1576,101 @@ R-ohjelmointia varten tarkoitetut asetukset
 
 ** Autocompletion
 #+BEGIN_SRC emacs-lisp
-  (require 'auto-complete)
-  (require 'auto-complete-config)
-  (ac-config-default)
-  (define-key ac-completing-map (kbd "M-h") 'ac-quick-help)
-  (setq ess-use-auto-complete t)
-  (setq ess-first-tab-never-complete 'unless-eol)
+(require 'auto-complete)
+(require 'auto-complete-config)
+(ac-config-default)
+(define-key ac-completing-map (kbd "M-h") 'ac-quick-help)
+(setq ess-use-auto-complete t)
+(setq ess-first-tab-never-complete 'unless-eol)
 
+(defun my-ess-hook ()
+  ;; ensure company-R-library is in ESS backends
+  (make-local-variable 'company-backends)
+  (cl-delete-if (lambda (x) (and (eq (car-safe x) 'company-R-args))) company-backends)
+  (push (list 'company-R-args 'company-R-objects 'company-R-library :separate)
+        company-backends))
+
+(add-hook 'ess-mode-hook 'my-ess-hook)
+#+END_SRC 
+
+** Dokumentaatio
+#+BEGIN_SRC emacs-lisp
+
+(evil-define-key 'normal 'ess-mode-map (kbd "åd") 'ess-display-help-on-object)
+
+#+END_SRC 
+
+* Help- ja Info-mode
+Käytä näitä kun olet info-tilassa (esim. luet Elisp-manuaalia)
+tai olet help-tilassa (haet apua jonkun funktion määrittelyyn esim).
+
+** Makrot
+#+BEGIN_SRC emacs-lisp
+
+(def-avain helpmap help-mode-map)
+(def-avain infomap Info-mode-map)
+(def-avain esshelpmap ess-help-mode-map)
+
+#+END_SRC 
+
+** Ikkunoiden hallinta
+Liiku ikkunoiden välillä ja sulje niitä. Pyri pitämään nämä samoina kuin Evil-moden
+ikkunoiden hallintatyökalut.
+
+#+BEGIN_SRC emacs-lisp
+
+  ;; (defmacro helpmap (key func)
+  ;;     `(define-key help-mode-map (kbd ,key) (quote ,func)))
+
+  ;; (defmacro infomap (key func)
+  ;;     `(define-key Info-mode-map (kbd ,key) (quote ,func)))
+
+
+ 
+(helpmap "öö" 'ace-window)
+(helpmap pilko-ikkuna-horisontaalisesti 'split-window-horizontally)
+(helpmap pilko-ikkuna-vertikaalisesti 'split-window-vertically)(infomap poista-aktiivinen-ikkuna 'delete-window)
+(helpmap poista-aktiivinen-ikkuna 'delete-window)
+(helpmap poista-muut-ikkunat 'delete-other-windows)
+(infomap "öö" 'ace-window)
+(infomap pilko-ikkuna-horisontaalisesti 'split-window-horizontally)
+(infomap pilko-ikkuna-vertikaalisesti 'split-window-vertically)
+(infomap poista-muut-ikkunat 'delete-other-windows) 
+
+;; evil-window-kommentoitu, koska sen toiminta ei ole taattua tiloissa, joissa
+;; Evil-modea ei ole.
+  
+(esshelpmap pilko-ikkuna-horisontaalisesti 'split-window-horizontally)
+(esshelpmap poista-aktiivinen-ikkuna 'delete-window)
+(esshelpmap pilko-ikkuna-vertikaalisesti 'split-window-vertically)
+(esshelpmap poista-muut-ikkunat 'delete-other-windows)
+(esshelpmap "öö" 'ace-window)
+ 
+#+END_SRC 
+** Bufferien hallinta
+Hallitse buffereita kuten tekisit normaalien tekstitiedostojen tapauksessa. Pyri
+pitämään nämä synkronoituna tavallisten Evil-moden buffereiden hallintatyökalujen kanssa.
+Näppäinyhdistelmissä käytettävät muuttujat löytyvät osiosta Globaalit muuttujat > Bufferit.
+
+#+BEGIN_SRC emacs-lisp
+
+  (infomap buffer-valikko 'buffer-menu)
+  (infomap tapa-aukioleva-buffer 'kill-this-buffer)
+  (helpmap buffer-valikko 'buffer-menu)
+  (helpmap tapa-aukioleva-buffer 'kill-this-buffer)
+  (infomap seuraava-buffer 'switch-to-next-buffer)
+  (infomap edellinen-buffer 'switch-to-prev-buffer)
+  (helpmap seuraava-buffer 'switch-to-next-buffer)
+  (helpmap edellinen-buffer 'switch-to-prev-buffer)
+
+#+END_SRC 
+** Liikkuminen
+#+BEGIN_SRC emacs-lisp
+
+(esshelpmap "j" 'next-line)
+(esshelpmap "k" 'previous-line)
+(esshelpmap "zj" 'scroll-up)
+(esshelpmap "zk" 'scroll-down)
 
 #+END_SRC 
 
@@ -1971,7 +2063,7 @@ Projektienhallintaan tarkoitettu työkalu.
 #+BEGIN_SRC emacs-lisp
 
 (projectile-mode +1)
-(define-key projectile-mode-map "åpr" 'projectile-command-map)
+;; (define-key projectile-mode-map "åpr" 'projectile-command-map)
 
 #+END_SRC 
 
