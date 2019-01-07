@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: Kuva
+# key: image
+# --
+#+ATTR_LATEX: :width 0.5\textwidth :caption \caption{$2}
+[[./$1]]
+$0

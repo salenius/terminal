@@ -1,0 +1,14 @@
+# -*- mode: snippet -*-
+# name: Python-interpreter
+# key: usr
+# --
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+###########################################
+#### File: $1 
+#### Author: Tommi Salenius
+#### Created: `(pvm-viikonpäivällä)`
+#### License: General Public License (`(pvm "%Y")`)
+###########################################
+
+$0

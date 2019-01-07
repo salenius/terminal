@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: R-koodi
+# key: r-code
+# --
+#+BEGIN_SRC R :session $1 :results $2
+
+$0
+
+#+END_SRC
+

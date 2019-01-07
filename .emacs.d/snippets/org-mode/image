@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: Kuva
+# key: kuva
+# --
+#+attr_latex: :width $1\textwidth
+[[file:$0]]

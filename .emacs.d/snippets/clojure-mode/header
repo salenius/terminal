@@ -1,0 +1,14 @@
+# -*- mode: snippet -*-
+# name: Header
+# key: usr
+# --
+(ns `(namespace-clojure)`
+  (:gen-class))
+;; -------------------------- ;;
+;; $1
+;; Author: Tommi Salenius
+;; Date: `(pvm-viikonpäivällä)`
+;; License: MIT (`(pvm "%Y")`)
+;; -------------------------- ;;
+
+$0

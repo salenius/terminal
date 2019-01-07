@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: Matriisi
+# key: matrix
+# --
+
+#+ATTR_LATEX: :mode math :environment ${1:b}matrix
+$0

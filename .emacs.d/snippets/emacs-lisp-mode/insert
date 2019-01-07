@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: Interactive insert
+# key: insert
+# --
+(interactive)(insert "$1")$0

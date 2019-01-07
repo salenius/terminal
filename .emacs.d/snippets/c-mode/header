@@ -1,0 +1,17 @@
+# -*- mode: snippet -*-
+# name: C-header
+# key: usr
+# --
+/*
+* File: $1
+* Author: Tommi Salenius
+* Email: `(insert sähköpostiosoite)`
+* Created: `(pvm-viikonpäivällä)`
+* License: MIT (`(pvm "%Y")`)
+*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+
+$0

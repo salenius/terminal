@@ -1,0 +1,34 @@
+# -*- mode: snippet -*-
+# name: Latex-header
+# key: latex
+# --
+#+STARTUP: overview
+#+TITLE: $1
+#+AUTHOR: Tommi Salenius
+#+EMAIL: tommi.salenius@helsinki.fi
+#+LICENCE: GPL (`(pvm "%Y")`)
+#+LATEX_HEADER: \usepackage[round]{natbib}
+#+BIBLIOGRAPHY: sources plainnat
+#+LATEX_HEADER: \numberwithin{equation}{section}
+#+LATEX_HEADER: \usepackage[margin=3.0cm]{geometry}
+#+LATEX_HEADER: \linespread{1.5}
+#+OPTIONS: toc:nil title:nil
+
+\begin{titlepage}
+\centering
+	\includegraphics[width=0.15\textwidth]{}\par\vspace{1cm}
+	{\scshape\LARGE ${2:University of Helsinki} \par}
+	\vspace{1cm}
+	{\scshape\Large ${3:Master's Thesis}\par}
+	\vspace{1.5cm}
+	{\huge\bfseries $1\par}
+	\vspace{2cm}
+	{\Large\itshape Tommi Salenius\par}
+	\vfill
+	supervised by\par
+	$4 
+\end{titlepage}
+
+\tableofcontents
+
+$0

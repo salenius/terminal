@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: Evil Insert-mode pikanäppäin
+# key: evilins
+# --
+(define-key evil-insert-state-map "$1" '$2)
+$0

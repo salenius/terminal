@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: Dictionary-loop
+# key: dicloop
+# --
+[$1 for key, val in $2.items()]$0 

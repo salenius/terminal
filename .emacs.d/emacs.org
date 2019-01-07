@@ -238,6 +238,8 @@ Evil-mode mahdollistaa Vim-tyyppisten näppäinyhdistelmien käytön.
 
 (require 'evil)
 (evil-mode 1)
+(require 'evil-lion)
+(evil-lion-mode 1)
 
 #+END_SRC
 
@@ -245,12 +247,12 @@ Evil-mode mahdollistaa Vim-tyyppisten näppäinyhdistelmien käytön.
 #+BEGIN_SRC emacs-lisp
 
       ;; Metamakro
-  (defmacro taulukko-eval (func table str)
+  (defun taulukko-eval (func table str)
        "Makro, jolla voit äkkiä kirjoittaa mikä taulukko TABLE kuvaa niitä
     näppäinyhdistelmiä, jotka tuottavat tietyn funktion FUNC. STR on t tai nil
     riippuen siitä onko taulukon 1. sarake tarkoitettu tulkittavaksi merkkijonona
     vai symbolina, eli laitetaanko sen ympärille sitaatit vai ei."
-    `(mapc (lambda (x) (lue-merkki-pari x ,func ,str)) ,table))
+    (mapc (lambda (x) (lue-merkki-pari x func str)) table))
 
 
     (defmacro kirjoita (merkki)
@@ -297,7 +299,8 @@ bufferin ja ikkunan sisällä.
 | +                 | 'evil-search-backward |
 
 #+BEGIN_SRC emacs-lisp :exports code :var normaalimuodot=normaalimuodot
-  (mapc (lambda (x) (lue-merkki-pari x 'evil/n t)) normaalimuodot)
+  ;;(mapc (lambda (x) (lue-merkki-pari x evil/n t)) normaalimuodot)
+  (taulukko-eval 'evil/n normaalimuodot t)
 #+END_SRC 
 
 #+RESULTS:
@@ -342,7 +345,7 @@ Hallitse buffereita ja liiku niiden välillä
 | Näppäinyhdistelmä     | Funktio           |
 |-----------------------+-------------------|
 | tallennus             | 'save-buffer      |
-| buffer-valikko        | 'ibuffer          |
+| buffer-valikko        | 'counsel-ibuffer  |
 | tapa-aukioleva-buffer | 'kill-this-buffer |
 | seuraava-buffer       | 'evil-next-buffer |
 | edellinen-buffer      | 'evil-prev-buffer |
@@ -510,25 +513,24 @@ näppäinyhdistelmät joilla ne voi tehdä käyttäjän ollessa Insert-modessa.
 
 #+BEGIN_SRC emacs-lisp
 
-  (define-key evil-insert-state-map (kbd "åå") 'evil-force-normal-state) ; Poistu insert-modesta normal-modeen
-  (evil/i "¨d" (kirjoita "$"))
-  (evil/i "¨." (kirjoita "¨"))
-  (evil/i "¨s" (kirjoita "\\"))
-  (evil/i "¨q" (kirjoita "\""))
+(define-key evil-insert-state-map (kbd "åå") 'evil-force-normal-state) ; Poistu insert-modesta normal-modeen
+(evil/i "¨d" (kirjoita "$"))
+(evil/i "¨." (kirjoita "¨"))
+(evil/i "¨s" (kirjoita "\\"))
+(evil/i "¨q" (kirjoita "\""))
 
-  (evil/i "å2" (kirjoita "@"))
-  (evil/i "å4" (kirjoita "$"))
-  (evil/i "å7" (kirjoita "\\"))
-  (evil/i "åi" (kirjoita "|"))
-  (evil/i "å." (kirjoita "å"))
+(evil/i "å2" (kirjoita "@"))
+(evil/i "å4" (kirjoita "$"))
+(evil/i "å7" (kirjoita "\\"))
+(evil/i "åi" (kirjoita "|")) (evil/i "å." (kirjoita "å"))
   
-  (evil/i "C-d" 'kill-word)
-  (evil/i "C-ö" 'evil-normal-state)
-  (evil/i "ås" 'save-buffer)
-  (evil/i "åc" 'shell-command)
-  ;; (define-key evil-insert-state-map (kbd "C-n") 'uusi-rivi)
-  (evil/i "C-k" 'evil-delete-backward-char)
-  (evil/i "C-b" 'hakasulkeet)
+(evil/i "C-d" 'kill-word)
+(evil/i "C-ö" 'evil-normal-state)
+(evil/i "ås" 'save-buffer)
+(evil/i "åc" 'shell-command)
+;; (define-key evil-insert-state-map (kbd "C-n") 'uusi-rivi)
+(evil/i "C-k" 'evil-delete-backward-char)
+(evil/i "C-b" 'hakasulkeet)
 
 #+END_SRC 
 
@@ -948,7 +950,7 @@ Funktiot tekevät seuraavia asioita:
 ** Dokumentaatio
 #+BEGIN_SRC emacs-lisp
 
-(evil-define-key 'normal 'python-mode-map (kbd "åd") 'elpy-doc)
+(evil-define-key 'normal python-mode-map (kbd "åd") 'elpy-doc)
 
 #+END_SRC 
 
@@ -1094,16 +1096,23 @@ Erilaisten sulkujen ja sitaattien hallintaan.
 #+END_SRC 
 ** Yhdistä ja pura sulkuja
 #+name: unite-sulut
-| Näppäinyhdistelmä | Funktio                 |
-|-------------------+-------------------------|
-| åbs               | 'sp-join-sexp           |
-| åbf               | 'sp-forward-slurp-sexp  |
-| åbb               | 'sp-backward-slurp-sexp |
-| åba               | 'sp-add-to-next-sexp    |
-| åbe               | 'sp-forward-barf-sexp   |
-| åbt               | 'sp-backward-barf-sexp  |
-| åbu               | 'sp-unwrap-sexp         |
-| åbk               | 'sp-kill-whole-line     |
+| Näppäinyhdistelmä | Funktio                   |
+|-------------------+---------------------------|
+| ,j                | 'sp-join-sexp             |
+| ,s                | 'sp-forward-slurp-sexp    |
+| ,S                | 'sp-backward-slurp-sexp   |
+| ,b                | 'sp-forward-barf-sexp     |
+| ,B                | 'sp-backward-barf-sexp    |
+| ,u                | 'sp-unwrap-sexp           |
+| ,k                | 'sp-kill-sexp             |
+| D                 | 'sp-kill-hybrid-sexp      |
+| ,K                | 'sp-backward-kill-sexp    |
+| ,ww               | 'sp-wrap-round            |
+| ,t                | 'sp-transpose-sexp        |
+| ,T                | 'sp-transpose-hybrid-sexp |
+| ,a                | 'sp-beginning-of-sexp     |
+| ,l                | 'sp-end-of-sexp           |
+| ,e                | 'sp-emit-sexp             |
 #+BEGIN_SRC emacs-lisp :exports code :var unite-sulut=unite-sulut
 (taulukko-eval 'evil/n unite-sulut t)
 #+end_SRC
@@ -1596,7 +1605,7 @@ R-ohjelmointia varten tarkoitetut asetukset
 ** Dokumentaatio
 #+BEGIN_SRC emacs-lisp
 
-(evil-define-key 'normal 'ess-mode-map (kbd "åd") 'ess-display-help-on-object)
+(evil-define-key 'normal ess-mode-map (kbd "åd") 'ess-display-help-on-object)
 
 #+END_SRC 
 
@@ -2226,6 +2235,25 @@ Kunnia kuuluu ekaschalkille (modernemacs.com)
 
 #+END_SRC 
 
+* Dired
+Tästä kiitos Pragmatic Emacs -blogin ylläpitäjälle Ben Maughanille.
+#+BEGIN_SRC emacs-lisp
+
+;; using ls-lisp with these settings gives case-insensitve
+;; sorting on OS X
+(require 'ls-lisp)
+(setq dired-listing-switches "-alhG")
+(setq ls-lisp-use-insert-directory-program nil)
+(setq ls-lisp-ignore-case t)
+(setq ls-lisp-use-string-collate nil)
+;; customise the appearance of the listing
+(setq ls-lisp-verbosity '(links uid))
+(setq ls-lisp-format-time-list '("%d.%m.%Y %H:%M"))
+(setq ls-lisp-use-localized-time-format t)
+(evil/n "öd" 'dired)
+
+#+END_SRC 
+
 * Isot tiedostot
 #+BEGIN_SRC emacs-lisp
 
@@ -2236,15 +2264,29 @@ Kunnia kuuluu ekaschalkille (modernemacs.com)
 * Clojure
 ** Kääntäminen
 #+BEGIN_SRC emacs-lisp
-  (defmacro clojure-key (kbd func)
-   `(evil-define-key 'normal clojure-mode-map (kbd ,kbd) ,func))
+(defun clojure-key (kbds func)
+ (evil-define-key 'normal clojure-mode-map (kbd kbds) func))
+ 
+(defun cider-debuggaus-map (kbds func)
+  (evil-define-key 'normal cider-stacktrace-mode-map (kbd kbds) func))
   
  
-  (clojure-key "årr" (lambda () (interactive)(save-buffer)
-		       (cider-load-buffer-and-switch-to-repl-buffer)))
+(defun cider-tallenna ()
+  (interactive)
+  (save-buffer)
+  (cider-load-buffer))
 
-  (clojure-key "årl" 'cider-eval-last-sexp)
+(clojure-key "årr" (lambda () (interactive)(save-buffer)
+		     (cider-load-buffer-and-switch-to-repl-buffer)))
 
+(clojure-key "årl" 'cider-eval-last-sexp)
+
+(clojure-key "årt" 'cider-test-run-test)
+
+(defun tapa-buffer-ja-palaa-takaisin ()
+  (interactive)
+  (kill-buffer)
+  (other-window -1))
 
 
 
@@ -2253,6 +2295,15 @@ Kunnia kuuluu ekaschalkille (modernemacs.com)
       ;; (cider-load-buffer-and-switch-to-repl-buffer)))
 
 #+END_SRC 
+#+name: clojure-painikkeet
+| Näppäinyhdistelmä | Funktio               |
+|-------------------+-----------------------|
+| årr               | 'cider-tallenna       |
+| årl               | 'cider-eval-last-sexp |
+| årt               | 'cider-test-run-test  |
+#+BEGIN_SRC emacs-lisp :exports code :var clojure-painikkeet=clojure-painikkeet
+(taulukko-eval 'clojure-key clojure-painikkeet t)
+#+end_SRC
 
 ** Näppäimet ja sulut
 #+BEGIN_SRC emacs-lisp
@@ -2274,13 +2325,22 @@ Kunnia kuuluu ekaschalkille (modernemacs.com)
 		'cider-repl-backward-input)
 	    (evil/i "C-f"
 		    'cider-repl-forward-input)
-	    (paredit-mode t)
+	    (smartparens-mode t)
 	    )))
 
   (cider-koukku cider-mode-hook)
 
 #+END_SRC 
 
+** Debugger
+Virheet näkyvät cider-stacktrace-mode:ssa.
+#+name: cider-debugger-taulu
+| Näppäinyhdistelmä | Funktio                        |
+|-------------------+--------------------------------|
+| öä                | 'tapa-buffer-ja-palaa-takaisin |
+#+BEGIN_SRC emacs-lisp :exports code :var cider-debugger-taulu=cider-debugger-taulu
+(taulukko-eval 'cider-debuggaus-map cider-debugger-taulu t)
+#+end_SRC
 * Laskin / calc
 Emacsin oman laskimen asetukset.
 ** Pikalaskin

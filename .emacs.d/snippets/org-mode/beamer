@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: Beamer-template
+# key: beamer
+# --
+#+startup: beamer
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [presentation]
+#+BEAMER_THEME: $1
+#+TITLE: $2
+#+AUTHOR: Tommi Salenius
+#+DATE: $3
+
+$0

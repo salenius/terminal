@@ -1,0 +1,14 @@
+# -*- mode: snippet -*-
+# name: Webskreippaus
+# key: beautifulsoup
+# --
+from bs4 import BeautifulSoup as bs
+import requests as req
+
+url_linkki = $1
+
+vastaus = req.get(url_linkki)
+
+html_tiedosto = bs(vastaus.text, 'html.parser')
+
+$0 = html_tiedosto.find_all($2)

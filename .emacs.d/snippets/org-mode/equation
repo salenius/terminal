@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: Yhtälö
+# key: equation
+# --
+\begin{equation}
+\label{$1}
+$0
+\end{equation}

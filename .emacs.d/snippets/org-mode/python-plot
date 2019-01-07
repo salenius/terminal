@@ -1,0 +1,12 @@
+# -*- mode: snippet -*-
+# name: Pyplot org-taulukko
+# key: python-plot
+# --
+#+BEGIN_SRC python :eval yes :results output :var org_table=$1
+from matplotlib import pyplot as plt
+
+x = [org_table[val][$2] for val in range($0)]
+
+plt.plot(x)
+plt.show()
+#+END_SRC

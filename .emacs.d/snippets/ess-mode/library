@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: Kirjasto
+# key: lib
+# --
+library("$1")
+$0

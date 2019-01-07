@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: org-header
+# key: usr
+# --
+#+STARTUP: overview
+#+TITLE: $1
+#+AUTHOR: Tommi Salenius
+#+EMAIL: tommisalenius@gmail.com
+#+DATE: `(pvm-viikonpäivällä)`
+#+LICENCE: GPL (`(pvm "%Y")`)
+#+LATEX_HEADER: \linespread{1.5}
+
+$0

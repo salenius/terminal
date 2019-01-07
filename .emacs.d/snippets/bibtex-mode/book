@@ -1,0 +1,12 @@
+# -*- mode: snippet -*-
+# name: Kirja
+# key: book
+# --
+@Book{${1:viittauslyhenne}
+ author    = {$2},
+ title     = {$3},
+ publisher = {$4},
+ year      = {$5},
+ address   = {$6},
+ edition   = {$7},
+}

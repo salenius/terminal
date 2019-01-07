@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: Funktio-prototyyppi
+# key: func
+# --
+<- function($1){
+
+## ${#Kommenttia}
+
+   $0
+
+}

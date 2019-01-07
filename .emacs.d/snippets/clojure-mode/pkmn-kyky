@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: Kyky ja esine
+# key: kyky
+# --
+(defmethod kyky-ja-esine [:{$1:pelaaja} {$2:pokemon}] [x y] {:ability $3 :esine $4})
+$0

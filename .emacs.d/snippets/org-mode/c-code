@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: C-snippet
+# key: c-code
+# --
+#+HEADERS: :includes '(<stdio.h> $1)
+#+BEGIN_SRC C :results output :exports both
+int main() {
+
+$0
+
+return 0;
+}
+#+END_SRC

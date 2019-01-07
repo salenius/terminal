@@ -1,0 +1,23 @@
+# -*- mode: snippet -*-
+# name: Unittest
+# key: unittest
+# --
+import unittest as ut
+
+class Test$1(ut.TestCase):
+      """
+      Luo tähän testit joita teet
+      haluamallasi moduulilla.
+      ---
+      Esim. testaa että jos funktio
+      f(x) = log(x) palauttaa
+      arvon 0 kun x = 1, niin
+      luo funktio, jossa on:
+
+      self.assertEqual(f(1), 0)
+      """
+      $0
+
+
+if __name__ == '__main__':
+   ut.main()

@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: Väitöskirja
+# key: phdthesis
+# --
+@Phdthesis{$1,
+author = {$2},
+title = {{$3}},
+school = {$4},
+year = {$5},
+}
+$0

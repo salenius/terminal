@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: Evil Normal-mode pikanäppäin
+# key: evilnorm
+# --
+(define-key evil-normal-state-map "$1" '$2)
+$0

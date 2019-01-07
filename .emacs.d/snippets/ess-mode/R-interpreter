@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: R-interpreter
+# key: usr
+# --
+#!/usr/bin/env Rscript
+############################################
+##### File: $1
+##### Author: Tommi Salenius
+##### Created: `(pvm-viikonpäivällä)`
+##### License: General Public License (`(pvm "%Y")`)
+############################################
+
+$0

@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: R-plot
+# key: r-plot
+# --
+#+BEGIN_SRC R :results output :var taulukko=$1
+
+library(ggplot2)
+
+ggplot(data=taulukko) + geom_line(aes(y=$2)) $0
+
+#+END_SRC

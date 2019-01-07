@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: Elisp-metatiedot
+# key: usr
+# --
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; $1
+;;; Author: Tommi Salenius
+;;; Email: tommisalenius@gmail.com
+;;; Created: $2
+;;; License: GPL (2018)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+$0

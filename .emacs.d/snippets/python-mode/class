@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: Luokka
+# key: luokka
+# --
+class $1:
+
+      """
+      $2
+      """
+      def __init__(self, $3):
+      	  $0

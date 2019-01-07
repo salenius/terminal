@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: Sqlite
+# key: sqlite
+# --
+#+name: $1
+#+header: :colnames yes
+#+header: :separator \|
+#+header: :results table
+#+header: :dir /Users/tommi/Tietokannat/
+#+header: :db $2
+#+begin_src sqlite
+$0
+#+end_src

@@ -1,0 +1,14 @@
+# -*- mode: snippet -*-
+# name: Artikkeli
+# key: article
+# --
+@Article{${1:viittauslyhenne},
+author = {$2},
+title = {{$3}},
+journal = {$4},
+year = {$5},
+volume = {$6},
+number = {$7},
+pages = {$8},
+}
+$0

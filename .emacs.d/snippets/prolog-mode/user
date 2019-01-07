@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: Header
+# key: usr
+# --
+/*
+* ${1:Tiedoston nimi}
+* Author: Tommi Salenius
+* Email: tommisalenius@gmail.com
+* Date: `(pvm-viikonpäivällä)`
+* Licence: (`(pvm "%Y")`)
+*/

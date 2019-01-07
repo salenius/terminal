@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: Pyplot-import
+# key: pyplot
+# --
+from matplotlib import pyplot as plt
+$0

@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: Majormode näppäinoikotien kuvaus
+# key: whichmajor
+# --
+(which-key-add-major-mode-key-based-replacements '$1
+  $0)
+						

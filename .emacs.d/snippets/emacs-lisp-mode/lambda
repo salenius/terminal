@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: Interactive Lambda
+# key: lambda
+# --
+(lambda() (interactive)($1))
+$0
