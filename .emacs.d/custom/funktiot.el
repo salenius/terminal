@@ -151,13 +151,9 @@
 
 (defun cumsum (termi &rest args)
   "Tee juokseva summa argumenteista ARGS listan indeksiin TERMI asti."
-  (if (> termi (length args)) (message "Valitsemasi indeksi ylittää listan pituuden. Ole hyvä ja lyhennä sitä, jotta funktio toimisi normaalisti.")
-  (let ((x 0) (y 0) (lst args))
-  (while (< x termi)
-    (setq x (+ x 1))
-    (setq y (+ y (car lst)))
-    (setq lst (cdr lst)))
-   y)))
+  (if (= termi 1)
+      (car args)
+    (+ (car args) (apply 'cumsum (cons (- termi 1) (cdr args))))))
 
 ;; Luo vastaava keskiarvo. Tässä on hyödynnetty Lispin symbolista kielenrakennetta;
 ;; Rakennetaan ensin cumsum-funktiota vastaava symboli, joka evaluoidaan oikeassa paikassa.
@@ -166,15 +162,8 @@
   "Tee juokseva keskiarvo argumenteista ARGS listan indeksiin TERMI asti."
   ;; Tarkista ensin, että indeksi ei ylitä listan pituutta.
   (if (> termi (length args)) (message "Valitsemasi indeksi ylittää listan pituuden. Ole hyvä ja lyhennä sitä, jotta funktio toimisi normaalisti.")
-    (let (var)
-      ;; Ongelma pyritään ratkaisemaan muuttamalla ohjelman kulku cumsum-funktion muotoon.
-      ;; Koska &rest args -muuttujat esiintyvät funktion bodyssa listana, ne pitää ensin
-      ;; parsia cons-funktion avulla yhteen listaan termin ja cunsum-funktion kanssa.
-      (setq var (cons 'cumsum (cons termi args)))
-      (setq var (/ (eval var) (float termi)))
-      ;; Lopuksi määrittele näytettävien desimaalien määrä. Tässä tapauksessa valittu 3.
-      ;; (string-to-number (format "%.4f" var)))))
-      (pyöristä var 3))))
+    (olk (val (jaa (apply 'cumsum (cons termi args)) termi))
+         (pyöristä val 3))))
 
 ;; Lue tekstiä ja evaluoi sitä Lisp-koodina.
 
@@ -187,31 +176,6 @@
 "Lue TXT, tulkitse se Lisp-koodiksi ja evaluoi se."
   (eval (car (read-from-string txt))))
   
-
-;; (defun lue-merkki-pari (merkki &optional func str)
-  ;; "Anna argumentiksi järjestetty merkkijonopari MERKKI, ja muunna se haluttuun
-;; Lisp-koodimuotoon, jossa se voidaan evaluoida. Halutessaan käyttäjä voi määritellä
-;; minkä funktion FUNC suhteen evaluoidaan, jolloin merkkiparia kohdellaan tämän funktion
-;; argumentteina. Lopuksi vielä määritä onko listan toinen alkio (cadr) merkkijono asettamalla STR arvoksi t tai nil."
-  ;; (let ((x nil) (y nil) (z1 nil) (z2 nil) (s-auki nil) (s-kiinni nil))
-    ;;Jos listan alkiot ovat numeroita, käännä ne merkkijonoiksi.
-     ;; (setq z1 (käännä-merkkijonoksi (car merkki)))
-     ;; (setq z2 (käännä-merkkijonoksi (cadr merkki)))
-     ;;Tarkista tulkitaanko listan cadr merkkijonona.
-     ;; (if (eq str t)
-	 ;; (progn (setq s-auki " \"")
-		;; (setq s-kiinni "\" "))
-       ;; (progn (setq s-auki " ")
-	      ;; (setq s-kiinni " ")))
-    ;; (if (eq func nil)
-	;; (progn
-	  ;; (setq x (concat "(" z1 " " z2 ")"))
-	  ;; (teksti-eval x))
-      ;; (progn
-	;; (setq y (symbol-name func))
-	;; (setq x (concat "(" y s-auki z1 s-kiinni z2 ")"))
-	;; (teksti-eval x)))))
-
 (defun lue-merkki-pari (merkki &optional func str)
   "Anna argumentiksi järjestetty merkkijonopari MERKKI, ja muunna se haluttuun
 Lisp-koodimuotoon, jossa se voidaan evaluoida. Halutessaan käyttäjä voi määritellä
@@ -259,7 +223,7 @@ argumentteina. Lopuksi vielä määritä onko listan toinen alkio (cadr) merkkij
   ;; `(mapc (lambda (x) (lue-merkki-pari x ,func ,str)) ,table))
 
 (defun taulukko-eval (func table str)
-       "Makro, jolla voit äkkiä kirjoittaa mikä taulukko TABLE kuvaa niitä
+       "Funktio, jolla voit äkkiä kirjoittaa mikä taulukko TABLE kuvaa niitä
     näppäinyhdistelmiä, jotka tuottavat tietyn funktion FUNC. STR on t tai nil
     riippuen siitä onko taulukon 1. sarake tarkoitettu tulkittavaksi merkkijonona
     vai symbolina, eli laitetaanko sen ympärille sitaatit vai ei."
@@ -362,8 +326,24 @@ Python-koodia sisältävien blokkien kannalta. Tarkoitettu vain org-tiedostoihin
 
        (insert (string-join (list kansio-ilman tiedosto-ilman)))))
 
-;(namespace-clojure)
+(defun forward-sexp-ehkä-uusi-rivi (&optional args)
+  "Etene s-expression kerrallaan eteenpäin. Koska tavallinen
+ sp-forward-sexp jumittuu kun tullaan rivin loppuun Evil-moden
+ ollessa päällä, funktio tarkistaa onko kursori rivin lopussa;
+ jos se on, niin siirrytään seuraavan rivin alkuun ja jatketaan
+ kuten yleensä. Funktion haittana on toistaiseksi se, että sitä
+ ei voi monistaa Evil-moden normaalitilassa."
+  (interactive)
+  (olk (eolvar nil)
+    (save-excursion 
+      (forward-char 1)
+      (setq eolvar (eolp)))
+    (if eolvar
+	(progn
+	  (next-line args)
+	  (beginning-of-line)
+	  (sp-forward-sexp args))
+      (sp-forward-sexp args))))
 
-;(file-name-directory buffer-file-name)
 
 ;; The File Ends Here ends

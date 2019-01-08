@@ -181,6 +181,27 @@ Pistä popup-valikko funktioille pystyyn.
 
 #+END_SRC 
 
+** Automaattinen sisennys / indentointi
+Saatu Emacs-wikistä. Ei toimi ainakaan Pythonin kanssa juuri niin kuin pitää,
+jos yrittää saada uuden sisennyksen valmiin sisennyksen alle (esim. uusi if-lause
+toisen if-lauseen sisälle.)
+#+BEGIN_SRC emacs-lisp
+
+(dolist (command '(yank yank-pop))
+   (eval `(defadvice ,command (after indent-region activate)
+            (and (not current-prefix-arg)
+                 (member major-mode '(emacs-lisp-mode lisp-mode
+                                                      clojure-mode    scheme-mode
+                                                      haskell-mode    ruby-mode
+                                                      rspec-mode      python-mode
+                                                      c-mode          c++-mode
+                                                      objc-mode       latex-mode
+                                                      plain-tex-mode  ess-r-mode))
+                 (let ((mark-even-if-inactive transient-mark-mode))
+                   (indent-region (region-beginning) (region-end) nil))))))
+
+#+END_SRC 
+
 * Globaalit muuttujat
 Tässä olevien muuttujien on tarkoitus kuvata näppäinyhdistelmiä, jotka toimivat kaikissa mahdollisissa
 tiloissa - tavallisten tekstitiedostojen lisäksi komentojen tulisi toimia Info, Help, Completions, Package Menu yms
@@ -2276,12 +2297,6 @@ Tästä kiitos Pragmatic Emacs -blogin ylläpitäjälle Ben Maughanille.
   (save-buffer)
   (cider-load-buffer))
 
-(clojure-key "årr" (lambda () (interactive)(save-buffer)
-		     (cider-load-buffer-and-switch-to-repl-buffer)))
-
-(clojure-key "årl" 'cider-eval-last-sexp)
-
-(clojure-key "årt" 'cider-test-run-test)
 
 (defun tapa-buffer-ja-palaa-takaisin ()
   (interactive)
@@ -2314,6 +2329,17 @@ Tästä kiitos Pragmatic Emacs -blogin ylläpitäjälle Ben Maughanille.
 
 #+END_SRC 
 
+** Liikkuminen
+Rebindaa Evil-moodin näppäimiä Lispiin sopivammaksi. Esim. e liikuu sanan sijasta s-expressionin
+verran eteenpäin ja b vastaavasti taakse.
+#+name: clojure-liikkuminen
+| Näppäinyhdistelmä | Funktio           |
+|-------------------+-------------------|
+| e                 | 'sp-forward-sexp  |
+| b                 | 'sp-backward-sexp |
+#+BEGIN_SRC emacs-lisp :exports code :var clojure-liikkuminen=clojure-liikkuminen
+(add-hook 'clojure-mode-hook (lambda ()(taulukko-eval 'clojure-key clojure-liikkuminen t)))
+#+end_SRC
 ** REPL
 #+BEGIN_SRC emacs-lisp
 
