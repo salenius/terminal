@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;; Omatekemien Lisp-funktioiden kokoelma
 ;; Author: Tommi Salenius
 ;; Email: tommisalenius@gmail.com
@@ -6,6 +7,7 @@
 
 (require 'cl)
 (require 'thingatpt)
+(require 'dash)
 
 (defun jaa-pareiksi (x)
   "Anna argumentiksi yhtenäinen lista s-ekspressioneita
@@ -22,25 +24,6 @@
    jäsenet puolestaan s-expressioneita, ja lisäksi joukko
    lokaalisten muuttujien avulla evaluoitavia s-expressioneita."
   `(let* ,(jaa-pareiksi seq) ,@body))
-
-
-
-;; Kerro automaaattisesti kahdella
-(defun kerro-2 (x)
-    "Kerro luku kahdella automaattisesti."
-    (* 2 x))
-
-(defun inc (num)
-  "Kasvata numeroa NUM yhdellä."
-  (setq num (1+ num)))
-
-(defun toista (x func)
-  "Toista haluttu toimenpide FUNC X määrä kertoja."
-  (defvar num)
-  (setq num 0)
-  (while (< num x)
-    (func)
-    (inc x)))
 
 ;; Luo merkki ja palaa x määrä merkkejä takaisin
 
@@ -107,6 +90,7 @@
 ;;  "Tarkista onko X nil."
 ;;  (= x nil))
 
+
 (defun lisp-evaluointi (arg)
     "Tallenna sijainti rivillä, liiku viimeisen )-merkin kohdalle ja evaluoi Elisp-koodi.
     Palaa lopuksi takaisin kursorin alkuperäiseen paikkaan."
@@ -115,8 +99,6 @@
       (move-end-of-line 1)
       (search-backward ")")
       (eval-last-sexp arg)))
-
-(message "Toimii") ; Katso toimiiko
 
 ;; Lisää tekstiä seuraavalle riville.
 
@@ -133,17 +115,13 @@
     (setq numb (concat "%." (number-to-string numb) "f"))
     (string-to-number (format numb luku))))
 
-(pyöristä 0.4354685894483325 4)
 
 (defun jaa (x y)
   "Jaa X luvulla Y ja pyöristä tulosta 3:n desimaalin tarkkuudelle."
-  (let ((z 0))
-    (setq z (/ (float x) (float y)))
-    (pyöristä z 3)))
-
-(jaa 0.45843 0.46382094)
-
-
+  (thread-first x
+    float
+    (/ (float y))
+    (pyöristä 3)))
 
 ;; Kumulatiivinen summafunktio. Tarkoituksena on,
 ;; että tätä voi käyttää org-modessa taulukoissa
@@ -151,9 +129,9 @@
 
 (defun cumsum (termi &rest args)
   "Tee juokseva summa argumenteista ARGS listan indeksiin TERMI asti."
-  (if (= termi 1)
-      (car args)
-    (+ (car args) (apply 'cumsum (cons (- termi 1) (cdr args))))))
+  (thread-last args
+    (-take termi)
+    (-reduce '+)))
 
 ;; Luo vastaava keskiarvo. Tässä on hyödynnetty Lispin symbolista kielenrakennetta;
 ;; Rakennetaan ensin cumsum-funktiota vastaava symboli, joka evaluoidaan oikeassa paikassa.
@@ -195,7 +173,6 @@ argumentteina. Lopuksi vielä määritä onko listan toinen alkio (cadr) merkkij
 	(teksti-eval x)))))
 
 
-
 (defun nimeä-symboli (merkki)
   (olk (x nil)
     (setq x (concat "(setq " (car merkki) " " (cadr merkki) ")"))
@@ -209,25 +186,12 @@ argumentteina. Lopuksi vielä määritä onko listan toinen alkio (cadr) merkkij
   (interactive)
   (pvm "%a, %d.%m.%Y"))
 
-(defun id (x)
-  "Identiteettifunktio, palauttaa argumentin X."
-  x)
-
-(id 5)
-
-;; (defmacro taulukko-eval (func table str)
-  ;; "Makro, jolla voit äkkiä kirjoittaa mikä taulukko TABLE kuvaa niitä
-  ;; näppäinyhdistelmiä, jotka tuottavat tietyn funktion FUNC. STR on t tai nil
-  ;; riippuen siitä onko taulukon 1. sarake tarkoitettu tulkittavaksi merkkijonona
-  ;; vai symbolina, eli laitetaanko sen ympärille sitaatit vai ei."
-  ;; `(mapc (lambda (x) (lue-merkki-pari x ,func ,str)) ,table))
-
 (defun taulukko-eval (func table str)
        "Funktio, jolla voit äkkiä kirjoittaa mikä taulukko TABLE kuvaa niitä
     näppäinyhdistelmiä, jotka tuottavat tietyn funktion FUNC. STR on t tai nil
     riippuen siitä onko taulukon 1. sarake tarkoitettu tulkittavaksi merkkijonona
     vai symbolina, eli laitetaanko sen ympärille sitaatit vai ei."
-    (mapc (lambda (x) (lue-merkki-pari x func str)) table))
+    (mapcar (lambda (x) (lue-merkki-pari x func str)) table))
 
 ;; Ikkunoiden hallinta
 
@@ -238,8 +202,6 @@ argumentteina. Lopuksi vielä määritä onko listan toinen alkio (cadr) merkkij
       (progn (kill-this-buffer)
 	     (delete-window))
     (kill-this-buffer)))
-
-;;(setq x (lue-merkki-pari '("ankka" "sorsa") 'setq t))
 
 ;; Etsi matriiseja tekstistä säännöllisen lausekkeen avulla (noudattaa Matlabin matriisikertolaskua)
 
@@ -344,6 +306,66 @@ Python-koodia sisältävien blokkien kannalta. Tarkoitettu vain org-tiedostoihin
 	  (beginning-of-line)
 	  (sp-forward-sexp args))
       (sp-forward-sexp args))))
+
+
+(defun transponoi (lst)
+  "Transponoi lista ((a b c) (d e f)) muotoon
+   ((a d) (b e) (c f))"
+  (olk (n (length (car lst))
+	  i 0
+	  nlst (list (mapcar (lambda (x) (nth 0 x)) lst)))
+       (while (< i n)
+	 (setq i (+ 1 i))
+	 (setq nlst (cons (mapcar (lambda (x) (nth i x)) lst) nlst))) ; Cons-funktio liittää uudet alkiot listan eteen, joten lopussa lista on käännettävä takaperin
+       (reverse (cdr nlst)))) ; Koska (car nlst) = (nil nil), pudota ne pois
+
+(defun liitä-merkkijonot (vec)
+  (mapconcat 'identity vec ""))
+
+
+(defun lisää-välit (vec)
+  (mapcar (lambda (x) (concat " " x)) vec))
+
+(defun lisää-sulut (str)
+  (concat "(" str ")"))
+
+
+(defun lista->elisp->eval (vstr)
+  (thread-first vstr
+    lisää-välit
+    liitä-merkkijonot
+    lisää-sulut
+    teksti-eval))
+
+(defun lainausmerkit-ympärille?
+    (str bool)
+  (if bool (concat "\"" str "\"") str))
+
+(defun lista->evil-define
+    (mode str? lst)
+  "Tekee annetun merkkijonolistan LST perusteella major moden MODE-kohtaisen
+näppäinoikotien. Funktio ottaa argumenteikseen näiden lisäksi parametrin STR?,
+joka on boolelainen; jos se on t, niin tulkitaan, että listan ensimmäinen alkio
+on kirjainyhdistelmä, jolloin alkion ympärille lisätään lainausmerkit, jos nil
+niin ei lisätä. MODE tulee aina antaa symbolina quote-merkin kanssa.
+
+Esim. funktio kuvaa jos str = t ja mode = 'python-mode:
+
+(\"år\" \"python-shell-send-buffer\") -> (evil-define-key 'normal python-mode-map
+(kbd \"år\") 'python-shell-send-buffer)"
+  (lista->elisp->eval (list "evil-define-key" "'normal"
+			(concat (symbol-name mode) "-map")
+			"(kbd"
+			(thread-first lst car
+				      (lainausmerkit-ympärille? str?)
+				      (concat ")"))
+			(concat "'" (cadr lst)))))
+
+(defun taulukko-mode-specific-keybindings
+    (mode str? taulukko)
+  "Ota argumentiksi org-modessa oleva taulukko ja käytä kaikki taulukon
+rivit lista->evil-define-mode-funktion kautta."
+  (mapcar (apply-partially 'lista->evil-define mode str?) taulukko))
 
 
 ;; The File Ends Here ends

@@ -8,6 +8,8 @@
 ;; Laita kaikki uudet asetukset emacs.org-nimiseen tiedostoon oikean
 ;; välilehden alle.
 
+(setq lexical-binding t)
+
 (package-initialize)
 
 (require 'package)
@@ -37,9 +39,6 @@
 (load "erikoismerkit.el")
 
 
-
-
-
 ;; Käytä org-modea
 (require 'org)
 (setq org-src-fontify-natively t)
@@ -61,20 +60,11 @@
 (require 'yasnippet)
 (yas-global-mode 1)
 
-					; Visual-mode
-;;(define-key evil-visual-state-map "C-ä" 'evil-window-next)
-;;(define-key evil-visual-state-map "årr" 'python-shell-send-region)
-;;(define-key evil-visual-state-map (kbd "C-ö") 'comment-line) ; Kommentoi tai unkommentoi rivi
-
-					; Minibuffer
-;;(define-key minibuffer-local-map "C-ä" 'minibuffer-selected-window)
-
 ;; Käytä Common Lisp -paketteja
 
 (require 'cl)
 
 
-;;(set-keyboard-coding-system nil)
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -88,7 +78,7 @@
     ("http://johnhcochrane.blogspot.com/feeds/posts/default/" "http://noahpinionblog.blogspot.com" "http://noahpinionblog.blogspot.com/" "http://johnhcochrane.blogspot.com/" "http://newmonetarism.blogspot.com/")))
  '(package-selected-packages
    (quote
-    (evil-lion org-ref company-statistics paredit projectile evil-smartparens clojure-mode markdown-mode cider haskell-mode multiple-cursors vlf virtualenvwrapper emms ob-prolog all-the-icons-dired all-the-icons google-translate flx ivy-youtube ido-vertical-mode 0blayout company general elisp-def ido-at-point counsel eclipse-theme w3m evil-magit helm-google helm-youtube helm which-key powerline-evil ivy elmacro smex elfeed-org elfeed ox-reveal org hydra bog gandalf-theme python-cell magit org-bullets suggest smartparens flycheck exec-path-from-shell jedi-direx virtualenv elpy python-mode auto-virtualenv jedi anaconda-mode yasnippet matlab-mode ess ace-window darcula-theme geeknote dracula-theme google-maps evil)))
+    (helpful evil-lion org-ref company-statistics paredit projectile evil-smartparens clojure-mode markdown-mode cider haskell-mode multiple-cursors vlf virtualenvwrapper emms ob-prolog all-the-icons-dired all-the-icons google-translate flx ivy-youtube ido-vertical-mode 0blayout company general elisp-def ido-at-point counsel eclipse-theme w3m evil-magit helm-google helm-youtube helm which-key powerline-evil ivy elmacro smex elfeed-org elfeed ox-reveal org hydra bog gandalf-theme python-cell magit org-bullets suggest smartparens flycheck exec-path-from-shell jedi-direx virtualenv elpy python-mode auto-virtualenv jedi anaconda-mode yasnippet matlab-mode ess ace-window darcula-theme geeknote dracula-theme google-maps evil)))
  '(safe-local-variable-values (quote ((org-src-preserve-indentation . t))))
  '(virtualenv-root "/Applications/anaconda3/envs/BoF/bin/"))
 (custom-set-faces
@@ -108,7 +98,7 @@
 (abbrev-mode -1)
 
 ;; Lataa omat asetukset emacs.org-tiedostosta
-(require 'org)
+
 (org-babel-load-file
   (expand-file-name "/Users/tommi/.emacs.d/emacs.org"))
 

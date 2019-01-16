@@ -165,13 +165,13 @@ korjaa tämän jälkeen värin heksadesimaalinumeroksi
 Pistä popup-valikko funktioille pystyyn.
 #+BEGIN_SRC emacs-lisp
 
-  (require 'company)
-  (setq company-idle-delay 0)
+(require 'company)
+(setq company-idle-delay 0)
 
-  (add-hook 'emacs-lisp-mode-hook 'company-mode)
-  (add-hook 'lisp-interactive-mode-hook 'company-mode)
-  (add-hook 'python-mode-hook 'company-mode)
-  (add-hook 'ess-mode-hook 'company-mode)
+(add-hook 'emacs-lisp-mode-hook 'company-mode)
+(add-hook 'lisp-interactive-mode-hook 'company-mode)
+(add-hook 'python-mode-hook 'company-mode)
+(add-hook 'ess-mode-hook 'company-mode)
 #+END_SRC 
 
 ** Tallennus
@@ -267,42 +267,32 @@ Evil-mode mahdollistaa Vim-tyyppisten näppäinyhdistelmien käytön.
 ** Makrot
 #+BEGIN_SRC emacs-lisp
 
-      ;; Metamakro
-  (defun taulukko-eval (func table str)
-       "Makro, jolla voit äkkiä kirjoittaa mikä taulukko TABLE kuvaa niitä
+;; Metamakro
+(defun taulukko-eval (func table str)
+  "Makro, jolla voit äkkiä kirjoittaa mikä taulukko TABLE kuvaa niitä
     näppäinyhdistelmiä, jotka tuottavat tietyn funktion FUNC. STR on t tai nil
     riippuen siitä onko taulukon 1. sarake tarkoitettu tulkittavaksi merkkijonona
     vai symbolina, eli laitetaanko sen ympärille sitaatit vai ei."
-    (mapc (lambda (x) (lue-merkki-pari x func str)) table))
+  (mapc (lambda (x) (lue-merkki-pari x func str)) table))
 
 
-    (defmacro kirjoita (merkki)
-      `(lambda ()
-	 (interactive)(insert ,merkki)))
+(defmacro kirjoita (merkki)
+  `(lambda ()
+     (interactive)(insert ,merkki)))
 
-    (defmacro def-avain (nimi moodi)
-      "Yleistyökalu, jonka avulla käyttäjä voi luoda funktioita, jotka asettavat
+(defmacro def-avain (nimi moodi)
+  "Yleistyökalu, jonka avulla käyttäjä voi luoda funktioita, jotka asettavat
     puolestaan pikanäppäinkomennon tietyn tilan funktioille. NIMI on funktion nimi,
     jonka makro palauttaa, MOODI on puolesta mode, jolle funktio voi luoda näppäinyhdistelmän."
-      `(defun ,nimi (key func)
-	 (define-key ,moodi (kbd key) func)))
+  `(defun ,nimi (key func)
+     (define-key ,moodi (kbd key) func)))
 
-    (def-avain evil/ins evil-insert-state-map)
-
-
-      ;; (defmacro evil/n (key func)
-      ;; `(define-key evil-normal-state-map (kbd ,key) (quote ,func)))
-
-    (def-avain evil/n evil-normal-state-map)
-    (def-avain evil/i evil-insert-state-map)
-    (def-avain evil/m evil-motion-state-map)
-    (def-avain evil/v evil-visual-state-map)
-
-      ;; (defmacro evil/i (key body)
-      ;; `(define-key evil-insert-state-map (kbd ,key) (lambda() (interactive)(,@body))))
-
-      ;; (defmacro evil/m (key func)
-      ;; `(define-key evil-motion-state-map (kbd ,key) (quote ,func)))
+(def-avain evil/ins evil-insert-state-map)
+(def-avain evil/n evil-normal-state-map)
+(def-avain evil/i evil-insert-state-map)
+(def-avain evil/m evil-motion-state-map)
+(def-avain evil/v evil-visual-state-map)
+(def-avain company/a company-active-map)
 #+END_SRC 
 
 ** Normal-mode
@@ -519,11 +509,12 @@ Avaa kalenteri. Suluissa, koska pikanäppäin osoittaa nykyään laskimeen.
 #+END_SRC 
 
 *** Help / apua
+Helpful on otettu korvaamaan nämä.
 #+BEGIN_SRC emacs-lisp
 
-(evil/n "åhk" 'counsel-descbinds)
-(evil/n "åhf" 'counsel-describe-function)
-(evil/n "åhv" 'counsel-describe-variable)
+;; (evil/n "åhk" 'counsel-descbinds)
+;; (evil/n "åhf" 'counsel-describe-function)
+;; (evil/n "åhv" 'counsel-describe-variable)
 
 #+END_SRC 
 
@@ -1334,7 +1325,7 @@ Korvaa Emacsin oletushaku Swiperilla.
 #+name: swiper-taulu
 | Näppäinyhdistelmä | Funktio |
 |-------------------+---------|
-| C-s               | 'swiper |
+| C-ä               | 'swiper |
 #+BEGIN_SRC emacs-lisp :exports code :var swiper-taulu=swiper-taulu
 (taulukko-eval 'evil/n swiper-taulu t)
 #+end_SRC
@@ -1704,6 +1695,25 @@ Näppäinyhdistelmissä käytettävät muuttujat löytyvät osiosta Globaalit mu
 
 #+END_SRC 
 
+* Helpful
+Paketti, joka tarjoaa tavallista parempaa dokumentointia Elisp-funktioista.
+#+BEGIN_SRC emacs-lisp
+
+(require 'helpful)
+
+#+END_SRC 
+
+** Näppäimet
+#+name: helpful-painikkeet
+| Näppäimet | Funktio           |
+|-----------+-------------------|
+| åhk       | 'helpful-key      |
+| åhf       | 'helpful-callable |
+| åhv       | 'helpful-variable |
+#+BEGIN_SRC emacs-lisp :exports code :var helpful-painikkeet=helpful-painikkeet
+(taulukko-eval 'evil/n helpful-painikkeet t)
+#+end_SRC
+
 * Regexp Builder
 Rakenna säännöllisiä lausekkeita minibufferissa ja käytä niitä hyödyksi.
 ** Säännöllisten lausekkeiden rakentaminen
@@ -1760,6 +1770,17 @@ Company tarjoaa tekstintäydennystä (autocompletion) lennosta.
   (require 'company)
 
 #+END_SRC 
+** Valikko
+Kun popup-valikko, joka tarjoaa mahdollisuuden valita vaihtoehtoja, tulee niin 
+käytä näitä näppäinyhdistelmiä.
+#+name: company-valikko
+| Näppäin | Funktio                  |
+|---------+--------------------------|
+| C-n     | 'company-select-next     |
+| C-p     | 'company-select-previous |
+#+BEGIN_SRC emacs-lisp :exports code :var company-valikko=company-valikko
+(taulukko-eval 'company/a company-valikko t)
+#+end_SRC
 
 ** Väriteema
 #+BEGIN_SRC emacs-lisp
@@ -2143,7 +2164,7 @@ Eshellille tarkoitetut asetukset tulevat tänne
 ** Pikanäppäin
 #+BEGIN_SRC emacs-lisp
 
-  (global-set-key (kbd "C-ä") 'eshell)
+  (global-set-key (kbd "C-s") 'eshell)
 
 #+END_SRC 
 ** Komentohistorian selaaminen
@@ -2285,11 +2306,14 @@ Tästä kiitos Pragmatic Emacs -blogin ylläpitäjälle Ben Maughanille.
 * Clojure
 ** Kääntäminen
 #+BEGIN_SRC emacs-lisp
-(defun clojure-key (kbds func)
- (evil-define-key 'normal clojure-mode-map (kbd kbds) func))
+(defmacro clojure-key (kbds func)
+  `(evil-define-key 'normal clojure-mode-map (kbd ,kbds) (quote ,func)))
+
+;; (defun clojure-key (kbds func)
+  ;; (add-hook 'clojure-mode-hook (lambda () (evil/n kbds func))))
  
 (defun cider-debuggaus-map (kbds func)
-  (evil-define-key 'normal cider-stacktrace-mode-map (kbd kbds) func))
+ (evil-define-key 'normal cider-stacktrace-mode-map (kbd kbds) func))
   
  
 (defun cider-tallenna ()
@@ -2304,21 +2328,29 @@ Tästä kiitos Pragmatic Emacs -blogin ylläpitäjälle Ben Maughanille.
   (other-window -1))
 
 
-
+;; (clojure-key "årr" cider-tallenna)
+;; ((clojure-avain "årr" 'cider-tallenna))
+;; (clojure-kokeilu)
   ;; (evil-define-key 'normal clojure-mode-map (kbd "årr")
     ;; (lambda () (interactive)(save-buffer)
       ;; (cider-load-buffer-and-switch-to-repl-buffer)))
 
 #+END_SRC 
 #+name: clojure-painikkeet
-| Näppäinyhdistelmä | Funktio               |
-|-------------------+-----------------------|
-| årr               | 'cider-tallenna       |
-| årl               | 'cider-eval-last-sexp |
-| årt               | 'cider-test-run-test  |
+| Näppäinyhdistelmä | Funktio              |
+|-------------------+----------------------|
+| årr               | cider-tallenna       |
+| årl               | cider-eval-last-sexp |
+| årt               | cider-test-run-test  |
 #+BEGIN_SRC emacs-lisp :exports code :var clojure-painikkeet=clojure-painikkeet
-(taulukko-eval 'clojure-key clojure-painikkeet t)
+;(taulukko-eval 'clojure-key clojure-painikkeet t)
+(taulukko-mode-specific-keybindings 'clojure-mode t clojure-painikkeet)
 #+end_SRC
+
+#+RESULTS:
+| årr | cider-tallenna       |
+| årl | cider-eval-last-sexp |
+| årt | cider-test-run-test  |
 
 ** Näppäimet ja sulut
 #+BEGIN_SRC emacs-lisp
@@ -2367,6 +2399,15 @@ Virheet näkyvät cider-stacktrace-mode:ssa.
 #+BEGIN_SRC emacs-lisp :exports code :var cider-debugger-taulu=cider-debugger-taulu
 (taulukko-eval 'cider-debuggaus-map cider-debugger-taulu t)
 #+end_SRC
+** Company
+#+BEGIN_SRC emacs-lisp
+
+(add-hook 'clojure-mode-hook #'company-mode)
+(add-hook 'cider-repl-mode-hook #'company-mode)
+(add-hook 'cider-mode-hook #'company-mode)
+
+#+END_SRC 
+
 * Laskin / calc
 Emacsin oman laskimen asetukset.
 ** Pikalaskin
@@ -2385,7 +2426,7 @@ Ota superlaskin / köyhän miehen Mathematica käyttöön
 *** Pikanäppäin
 #+BEGIN_SRC emacs-lisp
 
-  (evil/n "åqc" 'calc)
+(evil/n "åqc" 'calc)
 
 #+END_SRC 
 
@@ -2454,7 +2495,10 @@ Lasketaan yhteen: 8.0
 
 #+BEGIN_SRC emacs-lisp
 
-  ;; (setq mode-line-format
+(lista->elisp->eval '("evil-define-key" "'normal" "clojure-mode-map" 
+ "(kbd \"årr\")" "'cider-tallenna"))
+
+  ;; (setq mode-line-format 
   ;; 	(list
   ;; 	 "%b"
   ;; 	 " --- "
