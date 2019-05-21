@@ -367,5 +367,45 @@ Esim. funktio kuvaa jos str = t ja mode = 'python-mode:
 rivit lista->evil-define-mode-funktion kautta."
   (mapcar (apply-partially 'lista->evil-define mode str?) taulukko))
 
+(defun aja-koodi
+    (func)
+  (save-excursion
+	 (save-buffer)
+	 (eshell-command (funcall func (buffer-name)))))
+
+(defun python-tiedosto
+    ()
+  (interactive)
+  (aja-koodi (lambda (x) (concat "python " x))))
+
+(defun python-eksekuuttaa
+    ()
+  "Aja Python-tiedosto Eshellin läpi ja tulosta
+mahdollinen output näytölle."
+  (interactive)
+  (olk (buf-nimi (buffer-name)
+	python-komento (concat "python " buf-nimi))
+       (save-excursion
+	 (save-buffer)
+	 (eshell-command python-komento))))
+
+(defmacro interactive-choice
+    (teksti vaihtoehdot)
+  "Interactive-makron laajennus, jossa käyttäjältä tivataan
+jokin valmiista vaihtoehdoista. Argumentiksi syötetään
+promptin teksti ja lista vaihtoehdoista, jotka käyttäjä
+voi valita."
+  `(interactive
+    (list (completing-read ,teksti ,vaihtoehdot t nil))))
+
+;; Bussiaikatauluskripti
+
+(defun dösä-aikataulu
+    ()
+  "Muokkaa tästä sellainen, että voit hakea aikatauluja
+mielivaltaisesta paikasta toiseen."
+  (interactive)
+  (eshell-command "python /Users/tommi/Python/Automatisointi/bussiaikataulu.py"))
+
 
 ;; The File Ends Here ends

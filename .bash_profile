@@ -112,3 +112,5 @@ function conda_auto_env() {
 }
 
 export PROMPT_COMMAND="conda_auto_env;$PROMPT_COMMAND"
+
+export PATH="$HOME/.cargo/bin:$PATH"

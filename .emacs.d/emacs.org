@@ -15,10 +15,12 @@ Aseta kieli siten, että oletuksenomaisesti UTF-8-merkintätapa pätee.
 
 #+BEGIN_SRC emacs-lisp
 
-  (set-language-environment "UTF-8") (set-default-coding-systems 'utf-8)
-  (set-locale-environment "fi_FI.UTF-8")
-
-  (setq initial-scratch-message "Toimii")
+(set-language-environment "UTF-8") (set-default-coding-systems 'utf-8)
+(set-locale-environment "fi_FI.UTF-8")
+(setenv "LANG" "en_US.UTF-8")
+(setenv "LC_ALL" "en_US.UTF-8")
+(setenv "LC_CTYPE" "en_US.UTF-8")
+(setq initial-scratch-message "Toimii")
 #+END_SRC 
 
 #+RESULTS:
@@ -146,7 +148,7 @@ Valitse teematiedosto, jota haluat käyttää.
 
 #+BEGIN_SRC emacs-lisp
 
-(load-theme 'misterioso)
+(load-theme 'zenburn)
 
 #+END_SRC 
 ** Kursori
@@ -306,8 +308,6 @@ bufferin ja ikkunan sisällä.
 | §                 | 'end-of-line          |
 | zj                | 'evil-scroll-down     |
 | zk                | 'evil-scroll-up       |
-| '                 | 'evil-search-forward  |
-| +                 | 'evil-search-backward |
 
 #+BEGIN_SRC emacs-lisp :exports code :var normaalimuodot=normaalimuodot
   ;;(mapc (lambda (x) (lue-merkki-pari x evil/n t)) normaalimuodot)
@@ -318,7 +318,6 @@ bufferin ja ikkunan sisällä.
 | §  | 'end-of-line          |
 | zj | 'evil-scroll-down     |
 | zk | 'evil-scroll-up       |
-| '  | 'evil-search-forward  |
 | +  | 'evil-search-backward |
 
 *** Ikkunat
@@ -573,6 +572,49 @@ Evil-moden omat komennot, jotka saadaan avattua :-komennolla. Käytä defun-sija
 
 #+END_SRC 
 
+* Expand Region
+** Paketti
+#+BEGIN_SRC emacs-lisp
+
+(require 'expand-region)
+
+#+END_SRC 
+
+** Itse funktio
+#+BEGIN_SRC emacs-lisp
+
+(global-set-key (kbd "C-+") 'er/expand-region)
+(global-set-key (kbd "C--") 'er/contract-region)
+
+#+END_SRC 
+
+* Ace Jump
+** Paketti
+#+BEGIN_SRC emacs-lisp
+
+(require 'ace-jump-mode)
+
+#+END_SRC 
+
+** Bufferin sisällä liikkuminen
+Uudelleenkäytä Evil-moden f-kirjain sanan etsimiseen
+#+BEGIN_SRC emacs-lisp
+
+(evil/n "f" 'ace-jump-mode)
+
+#+END_SRC 
+
+** Salli ei-Ascii-kirjaimet
+Kudos tälle: https://gist.github.com/dmj/3944275
+#+BEGIN_SRC emacs-lisp
+
+(defadvice ace-jump-char-category (around adv-ace-jump-support-umlauts activate)
+  (unless (= (char-syntax (ad-get-arg 0)) ?w)
+    ad-do-it)
+(setq ad-return-value 'alpha))
+
+#+END_SRC 
+
 * Org-mode
 Org-modea varten tehtävät säädöt. Pyri tekemään niin, että asetukset alkavat t:llä.
 ** Bulletpoints
@@ -630,16 +672,24 @@ tässä ne kielet, joiden evaluointi mahdollistetaan.
   (org-babel-do-load-languages
    'org-babel-load-languages
     '((python . t)
+      (ipython . t)
       (R . t)
       (sqlite . t)
       (C . t)
       (java . t)
-      (prolog . t)))
+      (prolog . t))) 
 
 #+END_SRC 
 
 
 #+RESULTS
+** Kuvien esittäminen
+#+BEGIN_SRC emacs-lisp
+
+(add-hook 'org-babel-after-execute-hook 'org-display-inline-images 'append) 
+
+#+END_SRC 
+
 ** Listojen ja taulukoiden manipulointi                    :laskentataulukko:
 Meta + nuolinäppäimen avulla voi helposti liikuttaa taulukoiden
 sarakkeita ja rivejä sekä bulletpointseja otsikon alla edes takas.
@@ -725,6 +775,15 @@ Laita tähän asetukset, joilla agenda modesta pääsee pois.
     (lambda (fpath)
       (start-process "open" "*open*" "open" fpath)))
   (setq org-latex-pdf-process (list "latexmk -shell-escape -bibtex -f -pdf %f"))
+#+END_SRC 
+*** Latex-koodin formatointi
+Org-mode kykenee näyttämään Latexia matemaattisessa asussa, jos
+ominaisuuden kytkee päälle. Tässä osiossa tämän formatoinnin
+asetukset säädetään visuaalisesti miellyttäviksi.
+#+BEGIN_SRC emacs-lisp
+
+(plist-put org-format-latex-options :scale 1.5) ; Säädä fontin kokoa
+
 #+END_SRC 
 
 ** Beamer-mode                                                    :slideshow:
@@ -818,6 +877,13 @@ Org-moden taikanappula joka pystyy tekemään useita asiota:
 
 #+END_SRC 
 
+** Linkit
+Linkkien avaamiseksi
+#+BEGIN_SRC emacs-lisp
+
+(evil-define-key 'normal org-mode-map (kbd "åo") 'org-open-at-point)
+
+#+END_SRC 
 ** Viitteet
 Kun kirjoitat org-modella tekstiä, joka käännetään LaTeX-muotoon, käytä tätä
 voidakseksi lisätä linkkejä mahdollisimman helposti.
@@ -892,7 +958,7 @@ Aseta lähtökohtaisesti toimimaan
 #+END_SRC 
 
 ** Elpy
-Aseta Elpy toimimaan
+   Aseta Elpy toimimaan
 
 #+BEGIN_SRC emacs-lisp
 
@@ -914,8 +980,6 @@ eroon.
 #+BEGIN_SRC emacs-lisp
 
 (pyenv-mode)
-(setq python-shell-interpreter "/Applications/anaconda3/bin/jupyter")
-;;    python-shell-interpreter-args "console")
 (setq-default py-which-bufname "IPython")
 
 #+END_SRC 
@@ -960,11 +1024,19 @@ Funktiot tekevät seuraavia asioita:
 #+end_SRC
 
 ** Dokumentaatio
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :exports code
 
-(evil-define-key 'normal python-mode-map (kbd "åd") 'elpy-doc)
+(evil-define-key 'normal python-mode-map (kbd "åd") 'elpy-doc) 
 
 #+END_SRC 
+
+** Koodin ajo
+#+BEGIN_SRC emacs-lisp :exports code
+
+(add-hook 'python-mode-hook (lambda () (define-key python-mode-map (kbd "årr") 'python-shell-send-buffer))) 
+(define-key python-mode-map (kbd "årl") 'python-shell-send-region)
+
+#+END_SRC
 
 * Elisp / Emacs-Lisp
 ** Makrot
@@ -1279,6 +1351,28 @@ nimet jne.
 
 
 #+END_SRC
+** Copypaste
+Tästä kiitos tekijälle osoitteessa.
+http://blog.binchen.org/posts/paste-string-from-clipboard-into-minibuffer-in-emacs.html
+Eli näin voi copypasteta leikepöydälle minibufferin sisällä.
+#+BEGIN_SRC emacs-lisp
+
+(defun paste-from-x-clipboard()
+  (interactive)
+  (shell-command
+   "pbpaste"
+   1))
+
+(defun my/paste-in-minibuffer ()
+  (local-set-key (kbd "M-p") 'paste-from-x-clipboard))
+
+(add-hook 'minibuffer-setup-hook 'my/paste-in-minibuffer)
+
+#+END_SRC 
+
+#+RESULTS:
+| my/paste-in-minibuffer | pl/minibuffer-setup | elfeed-search--minibuffer-setup | ido-minibuffer-setup | rfn-eshadow-setup-minibuffer | minibuffer-history-isearch-setup | minibuffer-history-initialize |
+
 * Ibuffer
 Ibuffer kytketään päälle buffer-valikko-muuttujan avulla.
 ** Järjestely
@@ -1325,13 +1419,13 @@ Korvaa Emacsin oletushaku Swiperilla.
 #+name: swiper-taulu
 | Näppäinyhdistelmä | Funktio |
 |-------------------+---------|
-| C-ä               | 'swiper |
+| s                 | 'swiper |
 #+BEGIN_SRC emacs-lisp :exports code :var swiper-taulu=swiper-taulu
 (taulukko-eval 'evil/n swiper-taulu t)
 #+end_SRC
 
 #+RESULTS:
-| C-s | 'swiper |
+| s | 'swiper |
 
 ** Counsel
 *** Kytke päälle
@@ -1714,6 +1808,31 @@ Paketti, joka tarjoaa tavallista parempaa dokumentointia Elisp-funktioista.
 (taulukko-eval 'evil/n helpful-painikkeet t)
 #+end_SRC
 
+* JavaScript
+** JS2-mode
+JavaScriptiä varten oleva normaalia parempi major moodi.
+#+BEGIN_SRC emacs-lisp
+
+(require 'js2-mode)
+(require 'js2-refactor)
+(require 'xref-js2)
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+
+#+END_SRC 
+
+** Puolipiste
+Poista pakollisesta puolipisteestä herjaaminen.
+JavaScriptissä puolipiste ei ole pakollinen, mutta
+sitä suositellaan bugien välttämiseksi. Ongelmana
+puolipisteessä on, että sen käyttö on väkinäistä,
+ja se vähentää koodin luettavuutta.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq js2-strict-missing-semi-warning nil)
+
+#+END_SRC 
+
 * Regexp Builder
 Rakenna säännöllisiä lausekkeita minibufferissa ja käytä niitä hyödyksi.
 ** Säännöllisten lausekkeiden rakentaminen
@@ -1752,6 +1871,8 @@ Tähän omat säännölliset lausekkeet
 #+end_SRC
 
 * Google Translate
+Vanha google-translate-paketti ei toimi.
+Käytä tähän omaa skriptiä. 
 #+BEGIN_SRC emacs-lisp
 
 (require 'google-translate)
@@ -1934,7 +2055,7 @@ Gitiin liittyvät asetukset Magit-osiossa.
 Poista hiiri käytöstä.
 #+BEGIN_SRC emacs-lisp
 
-(mouse-wheel-mode -1)
+(mouse-wheel-mode 1) 
 
 #+END_SRC 
 
@@ -2296,6 +2417,24 @@ Tästä kiitos Pragmatic Emacs -blogin ylläpitäjälle Ben Maughanille.
 
 #+END_SRC 
 
+* Jupyter Notebook
+EIN toimii Emacsin Jupyter Notebook -integraationa.
+Tämä on vielä kesken. Pitää perehtyä siihen miten
+moodien kanssa homma toimii.
+** Funktiot
+#+BEGIN_SRC emacs-lisp
+
+
+#+END_SRC 
+
+** Pikanäppäimet
+#+name: ein-koodit
+| Näppäinyhdistelmä | Funktio |
+|-------------------+---------|
+|                   |         |
+#+BEGIN_SRC emacs-lisp :exports code :var ein-koodit=ein-koodit
+;; (taulukko-eval 'joku ein-koodit t)
+#+end_SRC
 * Isot tiedostot
 #+BEGIN_SRC emacs-lisp
 
@@ -2328,29 +2467,25 @@ Tästä kiitos Pragmatic Emacs -blogin ylläpitäjälle Ben Maughanille.
   (other-window -1))
 
 
-;; (clojure-key "årr" cider-tallenna)
-;; ((clojure-avain "årr" 'cider-tallenna))
-;; (clojure-kokeilu)
-  ;; (evil-define-key 'normal clojure-mode-map (kbd "årr")
-    ;; (lambda () (interactive)(save-buffer)
-      ;; (cider-load-buffer-and-switch-to-repl-buffer)))
-
 #+END_SRC 
 #+name: clojure-painikkeet
-| Näppäinyhdistelmä | Funktio              |
-|-------------------+----------------------|
-| årr               | cider-tallenna       |
-| årl               | cider-eval-last-sexp |
-| årt               | cider-test-run-test  |
+| Näppäinyhdistelmä | Funktio                  |
+|-------------------+--------------------------|
+| årr               | cider-tallenna           |
+| årl               | cider-eval-sexp-at-point |
+| årt               | cider-test-run-test      |
 #+BEGIN_SRC emacs-lisp :exports code :var clojure-painikkeet=clojure-painikkeet
 ;(taulukko-eval 'clojure-key clojure-painikkeet t)
 (taulukko-mode-specific-keybindings 'clojure-mode t clojure-painikkeet)
 #+end_SRC
 
-#+RESULTS:
-| årr | cider-tallenna       |
-| årl | cider-eval-last-sexp |
-| årt | cider-test-run-test  |
+** Hookit
+#+BEGIN_SRC emacs-lisp
+
+(add-hook 'clojure-mode-hook (lambda () (hs-minor-mode 1)))
+
+#+END_SRC 
+
 
 ** Näppäimet ja sulut
 #+BEGIN_SRC emacs-lisp
@@ -2472,6 +2607,8 @@ Selainasetukset tähän. Tämä ei toimi kunnolla, koska w3m ei asentunut oikein
 
 #+END_SRC 
 
+* PDF-Tools
+Tämä pitää asentaa oikein toimiakseen.
 * Leikkikenttä
 Laita tänne kaikkea höpsöttelyä.
 #+name: sitaattimerkit

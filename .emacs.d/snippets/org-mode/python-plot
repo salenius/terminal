@@ -1,12 +1,15 @@
 # -*- mode: snippet -*-
-# name: Pyplot org-taulukko
-# key: python-plot
+# name: Plot
+# key: plot
 # --
-#+BEGIN_SRC python :eval yes :results output :var org_table=$1
+#+BEGIN_SRC ipython :results drawer :session py2session
+%matplotlib inline
 from matplotlib import pyplot as plt
+import numpy as np
 
-x = [org_table[val][$2] for val in range($0)]
+x = np.linspace(0,$1,$1)
+y = $0
 
-plt.plot(x)
-plt.show()
+plt.title($2)
+plt.plot(x,y)
 #+END_SRC
