@@ -17,13 +17,23 @@
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (package-initialize)
 
+;; Use-package toimintaan
+;; This is only needed once, near the top of the file
+(eval-when-compile
+  ;; Following line is not needed if use-package.el is in ~/.emacs.d
+  (add-to-list 'load-path "/Users/tommi/.emacs.d/elpa")
+  (require 'use-package))
+
 ;; Ido-moodi päälle
-(require 'ido)
-(ido-mode t)
+;; (require 'ido)
+;; (ido-mode t)
+
+(use-package ido
+  :config (ido-mode t))
 
 ;; Laita oletuksena Vim-näppäimet
-(require 'evil)
-(evil-mode 1)
+;; (require 'evil)
+;; (evil-mode 1)
 ;; Tähän customoidut komennot
 
 (add-to-list 'exec-path "/Users/tommi/.local/bin")
@@ -33,6 +43,7 @@
 ;; Lataa aliakset
 (load "aliakset.el")
 (load "funktiot.el")
+(load "apikeys.el") ;; API-avaimet
 (setq-default abbrev-mode t)
 (setq abbrev-file-name
       "/Users/tommi/.emacs.d/custom/erikoismerkit.el")
@@ -101,7 +112,7 @@
      (deprecated :strike-through "#a9b7c6"))))
  '(package-selected-packages
    (quote
-    (ob-ipython helm-org-rifle gnuplot ein xref-js2 js2-refactor js2-mode ace-jump-mode expand-region rust-mode zenburn-theme helpful evil-lion org-ref company-statistics paredit projectile evil-smartparens clojure-mode markdown-mode cider haskell-mode multiple-cursors vlf virtualenvwrapper emms ob-prolog all-the-icons-dired all-the-icons google-translate flx ivy-youtube ido-vertical-mode 0blayout company general elisp-def ido-at-point counsel eclipse-theme w3m evil-magit helm-google helm-youtube helm which-key powerline-evil ivy elmacro smex elfeed-org elfeed ox-reveal org hydra bog gandalf-theme python-cell magit org-bullets suggest smartparens flycheck exec-path-from-shell jedi-direx virtualenv elpy python-mode auto-virtualenv jedi anaconda-mode yasnippet matlab-mode ess ace-window darcula-theme geeknote dracula-theme google-maps evil)))
+    (company-lsp lsp-python lsp-mode md4rd ess-mode org-gcal ob-ipython helm-org-rifle gnuplot ein xref-js2 js2-refactor js2-mode ace-jump-mode expand-region rust-mode zenburn-theme helpful evil-lion org-ref company-statistics paredit projectile evil-smartparens clojure-mode markdown-mode cider haskell-mode multiple-cursors vlf virtualenvwrapper emms ob-prolog all-the-icons-dired all-the-icons google-translate flx ivy-youtube ido-vertical-mode 0blayout company general elisp-def ido-at-point counsel eclipse-theme w3m evil-magit helm-google helm-youtube helm which-key powerline-evil ivy elmacro smex elfeed-org elfeed ox-reveal org hydra bog gandalf-theme python-cell magit org-bullets suggest smartparens flycheck exec-path-from-shell jedi-direx virtualenv elpy python-mode auto-virtualenv jedi anaconda-mode yasnippet matlab-mode ess ace-window darcula-theme geeknote dracula-theme google-maps evil)))
  '(safe-local-variable-values (quote ((org-src-preserve-indentation . t))))
  '(virtualenv-root "/Applications/anaconda3/envs/BoF/bin/"))
 (custom-set-faces
@@ -123,6 +134,6 @@
 ;; Lataa omat asetukset emacs.org-tiedostosta
 
 (org-babel-load-file
-  (expand-file-name "/Users/tommi/.emacs.d/emacs.org"))
+  (expand-file-name "/Users/tommi/.emacs.d/emacs_uusi.org"))
 
 ;; Koodi päättyy

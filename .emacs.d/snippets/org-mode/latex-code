@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: Latex-koodi
+# key: latex-code
+# --
+#+BEGIN_SRC latex
+$0
+#+END_SRC

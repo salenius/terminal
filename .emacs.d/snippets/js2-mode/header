@@ -1,0 +1,16 @@
+# -*- mode: snippet -*-
+# name: Header
+# key: usr
+# --
+#!/usr/bin/env node
+/*
+* $1
+* Author: Tommi Salenius
+* Email: tommisalenius@gmail.com
+* Date: `(pvm-viikonpäivällä)`
+* License: GPL (`(pvm "%Y")`)
+*/
+
+"use strict";
+
+$0

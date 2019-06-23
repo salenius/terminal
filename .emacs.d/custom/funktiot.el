@@ -407,5 +407,21 @@ mielivaltaisesta paikasta toiseen."
   (interactive)
   (eshell-command "python /Users/tommi/Python/Automatisointi/bussiaikataulu.py"))
 
+(defun add-funcall-to-front
+    (x)
+  (if (symbolp `(quote ,x))
+      (list 'funcall `(quote ,x))
+    (list 'funcall x)))
+
+
+(defmacro pipe
+    (init &rest funcs)
+  "Rakenna pipeline, jossa argumentiksi INIT tulee yksittäinen argumentti, joka
+sijoitetaan putkeen, jossa se käy useiden funktioiden FUNCS läpi. Funktioiden
+tulee olla sellaisia, että ne ottavat vastaan yhden argumentin (eli monen muuttujan
+funktioita ei voi olla); sulkeumat ovat sallittuja, samoin lambdat; nimettyjen
+funktioiden eteen on pakko laittaa '-merkki, jotta putki luetaan oikein."
+  (eval `(cons 'thread-last (cons ,init (quote ,(mapcar 'add-funcall-to-front funcs))))))
+
 
 ;; The File Ends Here ends

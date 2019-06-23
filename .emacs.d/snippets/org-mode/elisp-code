@@ -2,7 +2,7 @@
 # name: Elisp-koodi
 # key: elisp
 # --
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :lexical t
 
 $0
 

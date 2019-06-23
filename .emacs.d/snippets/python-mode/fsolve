@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: Fsolve
+# key: fsolve
+# --
+from scipy.optimize import fsolve

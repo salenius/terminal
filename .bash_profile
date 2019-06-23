@@ -7,7 +7,7 @@
 
 # Aseta värit terminaaliin globaalisti
 export CLICOLOR=1
-export LSCOLORS=GxFxCxDxBxegedabagaced
+export LSCOLORS='GxFxCxDxBxegedabagaced'
 PS1='\e[32;1m\h \e[33m\W\e[0m: '
 
 # Setting PATH for Python 3.7
@@ -40,10 +40,11 @@ export PATH="/Users/tommi/Golang/bin:$PATH"
 export PATH="/usr/local/Cellar/mongodb/3.6.4/bin:$PATH"
 
 # Aseta NPM:lle polku virheiden välttämiseksi
-export PATH=~/.npm-global/bin:$PATH
+export PATH="/Users/tommi/.npm-global/bin:$PATH"
 
 # Xdotoolia varten
 export DISPLAY=':0.0'
+
 
 ######### Javaa varten ###########
 

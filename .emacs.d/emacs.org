@@ -303,11 +303,11 @@ Seuraavat näppäinoikotiet on tarkoitettu helpottamaan liikkumista saman
 bufferin ja ikkunan sisällä.
 
 #+name: normaalimuodot
-| Näppäinyhdistelmä | Funktio               |
-|-------------------+-----------------------|
-| §                 | 'end-of-line          |
-| zj                | 'evil-scroll-down     |
-| zk                | 'evil-scroll-up       |
+| Näppäinyhdistelmä | Funktio           |
+|-------------------+-------------------|
+| §                 | 'end-of-line      |
+| zj                | 'evil-scroll-down |
+| zk                | 'evil-scroll-up   |
 
 #+BEGIN_SRC emacs-lisp :exports code :var normaalimuodot=normaalimuodot
   ;;(mapc (lambda (x) (lue-merkki-pari x evil/n t)) normaalimuodot)
@@ -922,13 +922,24 @@ Src blockien hallintaan tarkoitetut työkalut tänne.
   (add-hook 'org-mode-hook (lambda () (interactive)(setq-local require-final-newline nil)))
 #+END_SRC 
 
+** Google Calendar -sykronisointi
+#+BEGIN_SRC emacs-lisp
+
+(require 'org-gcal)
+
+(setq org-gcal-client-id google-kalenteri-client-id
+      org-gcal-client-secret google-kalenteri-secret-id
+      org-gcal-file-alist '((sähköpostiosoite . "/Users/tommi/Dropbox/orgfile.org")))
+
+#+END_SRC 
+
 * Python
 ** Kieli
 Aseta Python tukemaan Unicodea.
 
 #+BEGIN_SRC emacs-lisp
 
-(setenv "PYTHONIOENCODING" "utf-8")
+(setenv "PYTHONIOENCODING" "utf-8") 
 
 #+END_SRC 
 
@@ -989,8 +1000,8 @@ Tähän Python-shellin komennot
 #+BEGIN_SRC emacs-lisp
 
   (add-hook 'py-python-shell-mode-hook (lambda () (interactive)
-					 (evil/i "C-b" 'comint-previous-matching-input-from-input)
-					 (evil/i "C-f" 'comint-next-matching-input-from-input)))
+					 (evil/i "C-b" 'comint-previous-input)
+					 (evil/i "C-f" 'comint-next-input)))
 
 #+END_SRC 
 
@@ -2292,7 +2303,7 @@ Eshellille tarkoitetut asetukset tulevat tänne
 Tämä ei ota onnistukaseen vielä. Käytä M-up, M-down -komentoja.
 #+BEGIN_SRC emacs-lisp
   (add-hook 'eshell-mode-hook (lambda () (evil/i "C-b" 'eshell-previous-matching-input-from-input)))
-
+  (add-hook 'eshell-mode-hook (lambda () (evil/i "C-f" 'eshell-next-matching-input-from-input))) 
 #+END_SRC 
 ** Rivin manipulointi
 

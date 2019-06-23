@@ -176,7 +176,7 @@
     ("hxvihreä" "#008000" nil 0)
     ("hxvioletti" "#C8A2C8" nil 0)
     ("hää" "hän" nil 1)
-    ("infty" "∞" nil 1)
+    ("äinfty" "∞" nil 1)
     ("jja" "&" nil 2)
     ("johdannaistne" "johdannaisten" nil 1)
     ("josniin" "⟹" nil 0)

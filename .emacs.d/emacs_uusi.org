@@ -1,0 +1,573 @@
+#+STARTUP: overview
+#+TITLE: Emacs-konfiguraatio tiedosto
+#+AUTHOR: Tommi Salenius
+#+EMAIL: tommisalenius@gmail.com
+#+DATE: Su, 09.06.2019
+#+LICENCE: GPL (2019)
+#+LATEX_HEADER: \linespread{1.5}
+
+Tämä on uusi versio tiedostosta, johon kerätään kaikki Emacsin aloituskonfiguraatiot.
+
+* Muuttujat
+* Yleiset asetukset
+** Lexical binding
+Tee tästä oletus
+#+BEGIN_SRC emacs-lisp
+
+  (setq lexical-binding t)
+
+#+END_SRC 
+
+** Kieli
+Aseta kieli siten, että oletuksenomaisesti UTF-8-merkintätapa pätee.
+
+#+BEGIN_SRC emacs-lisp
+
+(set-language-environment "UTF-8") (set-default-coding-systems 'utf-8)
+(set-locale-environment "fi_FI.UTF-8")
+(setenv "LANG" "en_US.UTF-8")
+(setenv "LC_ALL" "en_US.UTF-8")
+(setenv "LC_CTYPE" "en_US.UTF-8")
+(setq initial-scratch-message "Toimii")
+#+END_SRC 
+
+#+RESULTS:
+: Toimii
+
+** Käyttäjätiedot
+#+name: user-info
+| Muuttuja         | Arvo                      |
+|------------------+---------------------------|
+| sähköpostiosoite | "tommisalenius@gmail.com" |
+#+BEGIN_SRC emacs-lisp :exports code :var user-info=user-info :results list
+(setq sähköpostiosoite "tommisalenius@gmail.com")
+#+end_SRC
+
+#+RESULTS:
+: - tommisalenius@gmail.com
+
+** Työkalurivi ja valikkorivi
+Piilota työkalurivi oletusarvoisesti. Valikkoriviä ei tarvitse piilottaa, koska
+Macissa se on sijoitettuna automaattisesti ikkunan yläpuolella sijaitsevaan
+palkkiin jota ei voi poistaa.
+#+BEGIN_SRC emacs-lisp
+
+(tool-bar-mode -1)
+
+#+END_SRC 
+** Aloitusbuffer
+Aseta oletusarvoisesti niin, että Emacsin default-aloitusbufferi
+ei pomppaa kuvaan kun ohjelma avataan. Sen sijaan scratch-bufferi toimii
+avausikkunana.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq inhibit-startup-screen t)
+
+#+END_SRC 
+** Rivin highlightaus
+Kytkin tämän pois päältä, koska se usein häiritsee enemmän kuin auttaa
+(esim. smartparens-moden kanssa turhahko).
+#+BEGIN_SRC emacs-lisp
+
+  (global-hl-line-mode nil)
+
+#+END_SRC 
+
+** Meta + X -substituutti (Helm/Smex)
+Alt + x -yhdistelmä on ergonomisesti aivan karsea. Tee näppäinyhdistelmä, jossa
+voidaan saada helpommin menu / valikko / funktiovalikko käyttöön. 
+Käytän tässä counsel-nimistä autocomplete-työkalua. 
+
+#+BEGIN_SRC emacs-lisp
+  ;; (define-key key-translation-map (kbd "åe") (kbd "M-x"))
+  ;; (define-key key-translation-map (kbd "åE") (kbd "M-X"))
+#+END_SRC 
+
+** Rivinumerot
+Emacsissa ei ole oletuksena rivinumeroita. Tämän avulla ne näkyvät.
+
+#+BEGIN_SRC emacs-lisp
+
+(global-linum-mode t)
+
+#+END_SRC 
+
+** Varmuuskopiot / backupit
+Oletusarvoisesti kaikki backup-tiedostot menevät samaan kansioon kuin alkuperäis-
+tiedostotkin. Luo kaikille tiedostoille yhtenäinen backup-kansio tilanteen helpottamiseksi.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq backup-directory-alist '(("." . "/Users/tommi/.emacs.d/backup")))
+
+#+END_SRC 
+
+** Merkkiääni
+Hiljennä editoreissa tyypillisesti oleva merkkiääni, joka soi esim. kun kursori
+on jo rivin alussa/lopussa ja yrittää siirtyä siitä eteenpäin.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq ring-bell-function 'ignore)
+
+#+END_SRC 
+
+** Näytä kellonaika
+Tämän ansiosta kellonaika ja pvm näkyvät helposti. Katso vielä formatointi
+uusiksi kunnolla (24-h ajanotto jne).
+
+#+BEGIN_SRC emacs-lisp
+
+(display-time-mode 1)
+(setq display-time-24hr-format t)
+
+#+END_SRC 
+
+** Kyllä ja ei -kysymykset
+Aseta niin, että voit vastata yes or no -tyylisiin kyssäreihiin vain y tai n. Helpottaa elämää.
+
+#+BEGIN_SRC emacs-lisp
+
+(fset 'yes-or-no-p 'y-or-n-p)
+
+#+END_SRC 
+
+** Terminaali / shell
+Aseta oletusarvoisesti zsh terminaaliksi, joka avataan kun käsky annetaan.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq explicit-shell-file-name "/bin/zsh")
+
+#+END_SRC 
+
+** Teema
+Valitse teematiedosto, jota haluat käyttää. 
+
+#+BEGIN_SRC emacs-lisp
+
+(load-theme 'zenburn)
+
+#+END_SRC 
+** Kursori
+Aseta kursorin väri fiksummaksi kuin oletusarvo. Voit vaihtaa värin
+laittamalla heksadesimaalisen värikoodin muodossa _hxväri_, jossa väri
+voi olla mikä tahansa kuten punainen, limenvihreä jne; abbrev-mode
+korjaa tämän jälkeen värin heksadesimaalinumeroksi
+
+#+BEGIN_SRC emacs-lisp
+
+(set-cursor-color "#c8a2c8")
+
+#+END_SRC 
+
+** Autocomplete
+Pistä popup-valikko funktioille pystyyn.
+#+BEGIN_SRC emacs-lisp
+
+(require 'company)
+(setq company-idle-delay 0)
+
+(add-hook 'emacs-lisp-mode-hook 'company-mode)
+(add-hook 'lisp-interactive-mode-hook 'company-mode)
+(add-hook 'python-mode-hook 'company-mode)
+(add-hook 'ess-mode-hook 'company-mode)
+#+END_SRC 
+
+** Tallennus
+#+BEGIN_SRC emacs-lisp
+
+(setq-default require-final-newline nil)
+
+#+END_SRC 
+
+** Automaattinen sisennys / indentointi
+Saatu Emacs-wikistä. Ei toimi ainakaan Pythonin kanssa juuri niin kuin pitää,
+jos yrittää saada uuden sisennyksen valmiin sisennyksen alle (esim. uusi if-lause
+toisen if-lauseen sisälle.)
+#+BEGIN_SRC emacs-lisp
+
+(dolist (command '(yank yank-pop))
+   (eval `(defadvice ,command (after indent-region activate)
+            (and (not current-prefix-arg)
+                 (member major-mode '(emacs-lisp-mode lisp-mode
+                                                      clojure-mode    scheme-mode
+                                                      haskell-mode    ruby-mode
+                                                      rspec-mode      python-mode
+                                                      c-mode          c++-mode
+                                                      objc-mode       latex-mode
+                                                      plain-tex-mode  ess-r-mode))
+                 (let ((mark-even-if-inactive transient-mark-mode))
+                   (indent-region (region-beginning) (region-end) nil))))))
+
+#+END_SRC 
+
+** Warningit
+#+BEGIN_SRC emacs-lisp
+
+  ;; (yasnippet backquote-change) to ‘warning-suppress-types’
+
+#+END_SRC 
+
+** Apit
+#+BEGIN_SRC emacs-lisp
+
+  (load "apikeys.el")
+
+#+END_SRC 
+
+* Evil
+#+BEGIN_SRC emacs-lisp
+
+  (use-package evil
+    :ensure t
+    :init
+
+    (defmacro def-avain (nimi moodi)
+      "Yleistyökalu, jonka avulla käyttäjä voi luoda funktioita, jotka asettavat
+      puolestaan pikanäppäinkomennon tietyn tilan funktioille. NIMI on funktion nimi,
+      jonka makro palauttaa, MOODI on puolesta mode, jolle funktio voi luoda näppäinyhdistelmän."
+      `(defun ,nimi (key func)
+	 (define-key ,moodi (kbd key) func)))
+
+    (defmacro luo-avain (moodi key func)
+      `(add-hook (quote ,(intern (concat (symbol-name moodi) "-hook")))
+		   (lambda () (evil-define-key 'normal ,(intern (concat (symbol-name moodi) "-map")) (kbd ,key) (quote ,func)))))
+
+
+    (defmacro kirjoita (merkki)
+      `(lambda ()
+	 (interactive)(insert ,merkki)))
+
+    (def-avain evil/ins evil-insert-state-map)
+    (def-avain evil/n evil-normal-state-map)
+    (def-avain evil/i evil-insert-state-map)
+    (def-avain evil/m evil-motion-state-map)
+    (def-avain evil/v evil-visual-state-map)
+    (def-avain company/a company-active-map)
+
+    :config
+    (evil-mode 1)
+
+    (evil/n "§" 'end-of-line)
+    (evil/n "zj" 'evil-scroll-down)
+    (evil/n "zk" 'evil-scroll-up)
+
+    (evil/n "ås" 'save-buffer)
+    (evil/n "öb" 'counsel-ibuffer)
+    (evil/n "öä" 'kill-this-buffer)
+
+    (evil/n "öd" 'dired)
+    (evil/n "gf" 'helm-find-files)
+    (evil/n "ää" 'evil-execute-macro)
+
+    (evil/n "öwh" 'split-window-right)
+    (evil/n "öwv" 'split-window-below)
+    (evil/n "ökt" 'delete-window)
+    (evil/n "öka" 'delete-other-windows)
+    (evil/n "öö" 'ace-window)
+
+    (evil/n "åhf" 'counsel-describe-function)
+    (evil/n "åhv" 'counsel-describe-variable)
+    (evil/n "åhk" 'describe-key)
+
+
+    (evil/n "C-ö" 'comment-line)
+    (evil/n "ål" 'eval-last-sexp)
+    (evil/n "å TAB" 'indent-region)
+
+    (evil/n "åe" 'helm-M-x)
+    (evil/i "åe" 'helm-M-x)
+    (evil/v "åe" 'helm-M-x)
+    (evil/n "C-s" 'swiper)
+
+    (evil/n "ånm" 'bookmark-set)
+    (evil/n "gm" 'bookmark-jump)
+
+    (evil/i "C-ö" 'evil-normal-state)
+    (evil/i "å." (kirjoita "å"))
+    (evil/i "åi" (kirjoita "|"))
+    (evil/i "¨s" (kirjoita "\\"))
+
+    ;; Smartparens
+
+    (evil/i "å SPC" 'sp-forward-sexp)
+
+    (evil/n ",j" 'sp-join-sexp)
+    (evil/n ",s" 'sp-forward-slurp-sexp)
+    (evil/n ",S" 'sp-backward-slurp-sexp)
+    (evil/n ",b" 'sp-forward-barf-sexp)
+    (evil/n ",B" 'sp-backward-barf-sexp)
+    (evil/n ",u" 'sp-unwrap-sexp)
+    (evil/n ",k" 'sp-kill-sexp)
+    (evil/n "D" 'sp-kill-hybrid-sexp)
+    (evil/n ",K" 'sp-backward-kill-sexp)
+    (evil/n ",ww" 'sp-wrap-round)
+    (evil/n ",t" 'sp-transpose-sexp)
+    (evil/n ",T" 'sp-transpose-hybrid-sexp)
+    (evil/n ",a" 'sp-beginning-of-sexp)
+    (evil/n ",l" 'sp-end-of-sexp)
+    (evil/n ",e" 'sp-emit-sexp)
+
+    (evil/v ",ww" 'sp-wrap-round)
+    (evil/n ",wc" 'sp-wrap-curly)
+    (evil/v ",wc" 'sp-wrap-curly)
+    (evil/n ",ws" 'sp-wrap-square)
+    (evil/v ",ws" 'sp-wrap-square)
+
+    ;; (evil/n "åps" 'ipython3)
+
+    ;; Hydrat
+
+    (evil/n "åg" 'magit-hydra/body)
+    (evil/n "åt" 'shell-hydra/body)
+
+
+
+    ;; Org mode
+
+    ;; (add-hook 'org-mode-hook (lambda () (evil-define-key 'normal org-mode-map "åre" 'org-edit-src-code)))
+    (luo-avain org-mode "åre" org-edit-src-code)
+
+    ;; ESS
+    (luo-avain ess-mode "årr" ess-eval-region-or-function-or-paragraph-and-step)
+    (luo-avain ess-mode "årl" ess-load-file)
+    (luo-avain ess-mode "åd" ess-display-help-on-object)
+
+    ;; Python
+    (luo-avain python-mode "åd" elpy-doc)
+
+    ) 
+#+END_SRC 
+* Helm
+#+BEGIN_SRC emacs-lisp
+
+  (use-package helm
+    :ensure t
+    :init (require 'helm-config))
+
+#+END_SRC 
+
+* Hydra
+#+BEGIN_SRC emacs-lisp
+
+  (use-package hydra
+    :init
+
+    (defhydra magit-hydra (:color pink
+				  :hint nil)
+      "
+  ^Branch^         ^Versionhallinta^
+  ^^^^^^^-----------------------------------
+  _s_: status       _a_: stageta kaikki muutokset
+  _i_: init         _f_: stageta tietty tiedosto
+  _o_: checkout     _c_: commitoi muutokset
+  ^^                _pl_: pullaa branchista
+  ^^                _psh_: pushaa Githubiin tms
+  "
+      ("s" magit-status)
+      ("i" magit-init)
+      ("o" magit-checkout)
+      ("a" magit-stage-modified)
+      ("f" magit-stage-file)
+      ("c" magit-commit)
+      ("pl" magit-pull-from-upstream)
+      ("psh" magit-push-current-to-upstream)
+      ("q" nil "peruuta" :color blue))
+
+    (defhydra shell-hydra (:color pink :hint nil)
+      "
+  ^Terminaalit^     ^Tulkit^
+  ------------------------------------------------
+  _e_: Eshell       _p_: iPython
+  _t_: iTerm        _r_: R
+  "
+      ("e" eshell :exit t)
+      ("t" term :exit t)
+      ("p" ipython3 :exit t)
+      ("r" R :exit t)
+      ("q" nil "peruuta" :color blue))
+
+    (defhydra skrollaus-hydra (:color pink :hint nil)
+      "
+  Skrollaa^
+  ----------------
+  _j_: alas   _k_: ylös
+  "
+      ("j" evil-scroll-down)
+      ("k" evil-scroll-up)
+      ("c" nil "peruuta" :color blue))
+
+    (defhydra org-meta-hydra (:color pink :hint nil)
+      "
+  Liiku
+  -----
+  _j_: alas
+  _k_: ylös
+  _r_: aja koodi
+  "
+      ("j" org-metadown)
+      ("k" org-metaup)
+      ("r" org-ctrl-c-ctrl-c)
+      ("q" nil "exit" :color blue))
+    )
+
+#+END_SRC 
+
+* Smartparens
+#+BEGIN_SRC emacs-lisp
+  (use-package smartparens
+    :ensure t
+
+    :config
+
+    (smartparens-global-mode 1)
+
+    ;; Chris Allenille kredit tästä
+    ;; Poista Lisp-moodeilta '-merkin ja `-merkin käyttö
+    ;; pareina, joiden vastine luodaan automaattisesti
+    (sp-with-modes sp--lisp-modes
+      (sp-local-pair "'" nil :actions nil) ; disable ', it's the quote character!
+      (sp-local-pair "`" "'" :when '(sp-in-string-p))) ; also only use the pseudo-quote inside strings where it serve as a hyperlink
+
+    (sp-with-modes '(org-mode)
+      (sp-local-pair "$" "$")
+      (sp-local-pair "$$" "$$"))
+
+    (sp-with-modes '(python-mode)
+      (sp-local-pair "\"\"\"" "\"\"\"")
+      (sp-local-pair "np.array([" "])" :trigger "np.array"))
+
+    (sp-with-modes '(sql-mode)
+      (sp-local-pair "/*" "*/")
+      (sp-local-pair "case" "end" :trigger "case"))
+
+    (sp-with-modes '(c-mode c++-mode)
+      (sp-local-pair "/*" "*/"))
+
+  )
+
+#+END_SRC 
+
+* Key-Chord
+#+BEGIN_SRC emacs-lisp
+
+  (use-package key-chord
+    :ensure t
+    :init
+
+    (defun evaluoi-ja-tallenna-tulos-leikepöydälle
+	(ssexp)
+      (interactive "P")
+      (thread-first ssexp
+	(eval-last-sexp)
+	(string)
+	(kill-new)
+	))
+
+    :config
+
+    (key-chord-mode 1)
+
+    (key-chord-define-global "eö" 'end-of-line)
+    (key-chord-define-global "öa" (lambda (x) (interactive "P")
+				    (progn (insert "[]") (backward-char))))
+    (key-chord-define-global "äa" (lambda (x) (interactive "P")
+				    (progn (insert "{}") (backward-char))))
+
+    ;; Hydrat
+    (key-chord-define-global "zx" 'skrollaus-hydra/body)
+
+    ;; org-mode
+    (key-chord-define org-mode-map "yu" 'org-meta-hydra/body)
+
+    ;; R:n lokaalit
+    (key-chord-define ess-mode-map ",," (kirjoita " <- "))
+    (key-chord-define ess-mode-map "yu" (kirjoita " %>% "))
+    )
+
+
+#+END_SRC 
+
+* Swiper
+#+BEGIN_SRC emacs-lisp
+
+  (use-package swiper
+    :ensure t)
+
+#+END_SRC 
+
+* Acejump
+* Python
+#+BEGIN_SRC emacs-lisp :lexical t
+
+  (use-package python-mode
+    :ensure t
+    :custom (elpy-rpc-backend "jedi")
+    :init
+    (use-package anaconda-mode
+      :ensure t)
+    :config
+    (elpy-enable)
+    )
+
+#+END_SRC 
+
+* ESS
+#+BEGIN_SRC emacs-lisp
+
+  (use-package ess
+    :ensure t
+    ;; :defer t ;; Pidä tässä kunnes keksit keinon toimia lokaalien key-chordien kanssa
+
+    :init
+    (setq ess-use-auto-complete t)
+    (setq ess-first-tab-never-complete 'unless-eol)
+    (setq-default inferior-R-program-name "/usr/local/bin/R")
+    (add-hook 'inferior-ess-mode-hook 'aseta-comint-liikkeet)
+    (defun my-ess-hook ()
+      ;; ensure company-R-library is in ESS backends
+      (make-local-variable 'company-backends)
+      (cl-delete-if (lambda (x) (and (eq (car-safe x) 'company-R-args))) company-backends)
+      (push (list 'company-R-args 'company-R-objects 'company-R-library :separate
+		  company-backends)))
+
+    :hook my-ess-hook 
+
+    )
+
+#+END_SRC 
+
+* LSP
+#+BEGIN_SRC emacs-lisp :lexical t
+
+  (use-package lsp-mode
+    :hook (python-mode . lsp)
+    :commands lsp)
+
+#+END_SRC 
+
+* Reddit
+Käytä Redditiä Emacsin kautta.
+#+BEGIN_SRC emacs-lisp
+
+  (use-package md4rd :ensure t
+    :config
+    (add-hook 'md4rd-mode-hook 'md4rd-indent-all-the-lines)
+    (setq md4rd-subs-active '(emacs lisp+Common_Lisp prolog clojure))
+    (setq md4rd--oauth-access-token
+	  reddit-tokeni-client-id)
+    (setq md4rd--oauth-refresh-token
+	  reddit-tokeni-secret-id)
+    (run-with-timer 0 3540 'md4rd-refresh-login))
+
+#+END_SRC 
+
+* Autocomplete
+#+BEGIN_SRC emacs-lisp
+
+
+
+#+END_SRC 
+
