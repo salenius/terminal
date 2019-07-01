@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 ;; Emacs-asetustiedosto
 ;; Author: Tommi Salenius
 ;; Email: tommisalenius at gmail.com
@@ -112,7 +113,7 @@
      (deprecated :strike-through "#a9b7c6"))))
  '(package-selected-packages
    (quote
-    (company-lsp lsp-python lsp-mode md4rd ess-mode org-gcal ob-ipython helm-org-rifle gnuplot ein xref-js2 js2-refactor js2-mode ace-jump-mode expand-region rust-mode zenburn-theme helpful evil-lion org-ref company-statistics paredit projectile evil-smartparens clojure-mode markdown-mode cider haskell-mode multiple-cursors vlf virtualenvwrapper emms ob-prolog all-the-icons-dired all-the-icons google-translate flx ivy-youtube ido-vertical-mode 0blayout company general elisp-def ido-at-point counsel eclipse-theme w3m evil-magit helm-google helm-youtube helm which-key powerline-evil ivy elmacro smex elfeed-org elfeed ox-reveal org hydra bog gandalf-theme python-cell magit org-bullets suggest smartparens flycheck exec-path-from-shell jedi-direx virtualenv elpy python-mode auto-virtualenv jedi anaconda-mode yasnippet matlab-mode ess ace-window darcula-theme geeknote dracula-theme google-maps evil)))
+    (ipython-shell-send org-mode ctable edbi-sqlite edbi emacsql-sqlite emacsql helm-projectile pyvenv-mode pyenv company-lsp lsp-python lsp-mode md4rd ess-mode org-gcal ob-ipython helm-org-rifle gnuplot ein xref-js2 js2-refactor js2-mode ace-jump-mode expand-region rust-mode zenburn-theme helpful evil-lion org-ref company-statistics paredit projectile evil-smartparens clojure-mode markdown-mode cider haskell-mode multiple-cursors vlf virtualenvwrapper emms ob-prolog all-the-icons-dired all-the-icons google-translate flx ivy-youtube ido-vertical-mode 0blayout company general elisp-def ido-at-point counsel eclipse-theme w3m evil-magit helm-google helm-youtube helm which-key powerline-evil ivy elmacro smex elfeed-org elfeed ox-reveal org hydra bog gandalf-theme python-cell magit org-bullets suggest smartparens flycheck exec-path-from-shell jedi-direx virtualenv elpy python-mode auto-virtualenv jedi anaconda-mode yasnippet matlab-mode ess ace-window darcula-theme geeknote dracula-theme google-maps evil)))
  '(safe-local-variable-values (quote ((org-src-preserve-indentation . t))))
  '(virtualenv-root "/Applications/anaconda3/envs/BoF/bin/"))
 (custom-set-faces

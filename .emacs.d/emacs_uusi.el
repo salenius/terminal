@@ -97,34 +97,33 @@
   (evil/n "§" 'end-of-line)
   (evil/n "zj" 'evil-scroll-down)
   (evil/n "zk" 'evil-scroll-up)
-
+  
   (evil/n "ås" 'save-buffer)
   (evil/n "öb" 'counsel-ibuffer)
   (evil/n "öä" 'kill-this-buffer)
-
+  
   (evil/n "öd" 'dired)
   (evil/n "gf" 'helm-find-files)
   (evil/n "ää" 'evil-execute-macro)
-
+  
   (evil/n "öwh" 'split-window-right)
   (evil/n "öwv" 'split-window-below)
   (evil/n "ökt" 'delete-window)
   (evil/n "öka" 'delete-other-windows)
   (evil/n "öö" 'ace-window)
-
   (evil/n "åhf" 'counsel-describe-function)
   (evil/n "åhv" 'counsel-describe-variable)
   (evil/n "åhk" 'describe-key)
-
-
-  (evil/n "C-ö" 'comment-line)
-  (evil/n "ål" 'eval-last-sexp)
-  (evil/n "å TAB" 'indent-region)
-
+  (evil/n "åhl" 'select-jargon)
   (evil/n "åe" 'helm-M-x)
   (evil/i "åe" 'helm-M-x)
   (evil/v "åe" 'helm-M-x)
   (evil/n "C-s" 'swiper)
+
+  (evil/n "C-ö" 'comment-line)
+  (evil/n "ål" 'eval-last-sexp)
+  (evil/n "åL" 'eval-last-sexp-and-replace-it-by-result)
+  (evil/n "å TAB" 'indent-region)
 
   (evil/n "ånm" 'bookmark-set)
   (evil/n "gm" 'bookmark-jump)
@@ -133,11 +132,10 @@
   (evil/i "å." (kirjoita "å"))
   (evil/i "åi" (kirjoita "|"))
   (evil/i "¨s" (kirjoita "\\"))
-
-  ;; Smartparens
-
+  (evil/i "¨d" (kirjoita "$"))
+  (evil/i "å2" (kirjoita "@"))
   (evil/i "å SPC" 'sp-forward-sexp)
-
+  
   (evil/n ",j" 'sp-join-sexp)
   (evil/n ",s" 'sp-forward-slurp-sexp)
   (evil/n ",S" 'sp-backward-slurp-sexp)
@@ -153,32 +151,27 @@
   (evil/n ",a" 'sp-beginning-of-sexp)
   (evil/n ",l" 'sp-end-of-sexp)
   (evil/n ",e" 'sp-emit-sexp)
-
+  
   (evil/v ",ww" 'sp-wrap-round)
   (evil/n ",wc" 'sp-wrap-curly)
   (evil/v ",wc" 'sp-wrap-curly)
   (evil/n ",ws" 'sp-wrap-square)
   (evil/v ",ws" 'sp-wrap-square)
 
-  ;; (evil/n "åps" 'ipython3)
-
   ;; Hydrat
 
   (evil/n "åg" 'magit-hydra/body)
   (evil/n "åt" 'shell-hydra/body)
 
-
-
-  ;; Org mode
-
-  ;; (add-hook 'org-mode-hook (lambda () (evil-define-key 'normal org-mode-map "åre" 'org-edit-src-code)))
+  ;; Major mode -spesifit evil-pikanäppäimet
   (luo-avain org-mode "åre" org-edit-src-code)
-
-  ;; ESS
+  (luo-avain org-src-mode "ås" org-edit-src-exit)
   (luo-avain ess-mode "årr" ess-eval-region-or-function-or-paragraph-and-step)
   (luo-avain ess-mode "årl" ess-load-file)
   (luo-avain ess-mode "åd" ess-display-help-on-object)
-
+  (luo-avain python-mode "åd" elpy-doc)
+  (luo-avain python-mode "åp" python-projekti-hydra/body)
+  
 
   )
 
@@ -190,40 +183,90 @@
   :init
 
   (defhydra magit-hydra (:color pink
-				:hint nil)
-    "
-^Branch^         ^Versionhallinta^
-^^^^^^^-----------------------------------
-_s_: status       _a_: stageta kaikki muutokset
-_i_: init         _f_: stageta tietty tiedosto
-_o_: checkout     _c_: commitoi muutokset
-^^                _pl_: pullaa branchista
-^^                _psh_: pushaa Githubiin tms
-"
-    ("s" magit-status)
-    ("i" magit-init)
-    ("o" magit-checkout)
-    ("a" magit-stage-modified)
-    ("f" magit-stage-file)
-    ("c" magit-commit)
-    ("pl" magit-pull-from-upstream)
-    ("psh" magit-push-current-to-upstream)
-    ("q" nil "peruuta" :color blue))
-
+  				:hint nil)
+      "
+  ^Branch^         ^Versionhallinta^
+  ^^^^^^^-----------------------------------
+  _s_: status       _a_: stageta kaikki muutokset
+  _i_: init         _f_: stageta tietty tiedosto
+  _o_: checkout     _c_: commitoi muutokset
+  ^^                _pl_: pullaa branchista
+  ^^                _psh_: pushaa Githubiin tms
+  "
+      ("s" magit-status)
+      ("i" magit-init)
+      ("o" magit-checkout)
+      ("a" magit-stage-modified)
+      ("f" magit-stage-file)
+      ("c" magit-commit)
+      ("pl" magit-pull-from-upstream)
+      ("psh" magit-push-current-to-upstream)
+      ("q" nil "peruuta" :color blue))
   (defhydra shell-hydra (:color pink :hint nil)
+        "
+    ^Terminaalit^     ^Tulkit^
+    ------------------------------------------------
+    _e_: Eshell       _p_: iPython
+    _t_: iTerm        _r_: R
     "
-^Terminaalit^     ^Tulkit^
-------------------------------------------------
-_e_: Eshell       _p_: iPython
-_t_: iTerm        _r_: R
-"
-    ("e" eshell :exit t)
-    ("t" term :exit t)
-    ("p" ipython3 :exit t)
-    ("r" R :exit t)
-    ("q" nil "peruuta" :color blue))
-
+        ("e" eshell :exit t)
+        ("t" term :exit t)
+        ("p" ipython3 :exit t)
+        ("r" R :exit t)
+        ("q" nil "peruuta" :color blue))
+  
   (defhydra skrollaus-hydra (:color pink :hint nil)
+      "
+  Skrollaa^
+  ----------------
+  _j_: alas   _k_: ylös
+  "
+      ("j" evil-scroll-down)
+      ("k" evil-scroll-up)
+      ("c" nil "peruuta" :color blue))
+  (defhydra org-meta-hydra (:color pink :hint nil)
+        "
+    Liiku
+    -----
+    _j_: alas
+    _k_: ylös
+    _r_: aja koodi
+    "
+        ("j" org-metadown)
+        ("k" org-metaup)
+        ("r" org-ctrl-c-ctrl-c)
+        ("q" nil "exit" :color blue))
+  (defhydra helm-projektiili-hydra (:color pink :hint nil :exit t)
+        "
+    Projektien hallinta
+    -------------------
+    _p_: etsi projekti
+    _f_: etsi tiedosto
+    _g_: etsi tiettyä regexiä
+    "
+        ("p" helm-projectile-switch-project)
+        ("f" helm-projectile-find-file)
+        ("g" helm-projectile-grep)
+        ("q" nil "exit" :color blue)
+        )
+  (defhydra python-projekti-hydra (:color pink :hint nil)
+      "
+  ^Virtuaaliympäristö
+  -------------------------------
+  _v_: valitse ympäristö
+  _a_: aktivoi projektiin sidottu
+  _d_: deaktivoi nykyinen
+  _c_: luo uusi ympäristö
+  "
+      ("v" valitse-virtuaaliympäristö)
+      ("a" pyvenv-activate)
+      ("d" pyvenv-deactivate)
+      ("c" pyvenv-create)
+      ("q" nil "exit" :color blue))
+
+  )
+
+(defhydra skrollaus-hydra (:color pink :hint nil)
     "
 Skrollaa^
 ----------------
@@ -232,20 +275,6 @@ _j_: alas   _k_: ylös
     ("j" evil-scroll-down)
     ("k" evil-scroll-up)
     ("c" nil "peruuta" :color blue))
-
-  (defhydra org-meta-hydra (:color pink :hint nil)
-    "
-Liiku
------
-_j_: alas
-_k_: ylös
-_r_: aja koodi
-"
-    ("j" org-metadown)
-    ("k" org-metaup)
-    ("r" org-ctrl-c-ctrl-c)
-    ("q" nil "exit" :color blue))
-  )
 
 (use-package smartparens
   :ensure t
@@ -315,6 +344,65 @@ _r_: aja koodi
 (use-package swiper
   :ensure t)
 
+(use-package yasnippet
+  :ensure t
+  :init
+  (add-to-list 'warning-suppress-types '(yasnippet backquote-change))
+)
+
+(use-package projectile
+  :ensure t
+  :config
+  (projectile-mode 1)
+  (use-package helm-projectile
+    :ensure t
+    :config
+    )
+  (helm-projectile-on)
+  )
+
+(use-package org
+  :ensure t
+  :init
+
+  ;; Tuetut
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((python . t)
+     (ipython . t)
+     (R . t)
+     (sqlite . t)
+     (C . t)
+     (java . t)
+     (prolog . t)
+     (latex . t)
+     (matlab . t)
+     (haskell . t)
+     (emacs-lisp . t)
+     (js . t)))
+  )
+
+(use-package python-mode
+  :ensure t
+  :custom (elpy-rpc-backend "jedi")
+  :init
+  (use-package anaconda-mode
+    :ensure t)
+  (use-package pyvenv
+    :ensure t
+    :config
+    (setq virtuaaliympäristöjen-sijoituspaikka "/Applications/anaconda3/envs")
+    (setenv "WORKON_HOME" virtuaaliympäristöjen-sijoituspaikka)
+    (defun valitse-virtuaaliympäristö ()
+      (interactive)
+      (ido-completing-read "Valitse ympäristö: " (pyvenv-virtualenv-list)))
+    )
+  :config
+  (elpy-enable)
+  ;; (virtualenv-minor-mode 1)
+  (pyvenv-mode 1)
+    )
+
 (use-package ess
   :ensure t
   ;; :defer t ;; Pidä tässä kunnes keksit keinon toimia lokaalien key-chordien kanssa
@@ -333,6 +421,34 @@ _r_: aja koodi
 
   :hook my-ess-hook 
 
+  )
+
+(use-package lsp-mode
+  :defer t
+  ;; :hook (python-mode . lsp)
+  ;; :commands lsp
+  )
+
+(use-package edbi
+  :ensure t
+  )
+
+(use-package emacsql
+  :ensure t
+  :defer t
+
+  :init
+  (use-package emacsql-sqlite
+    :ensure t
+    :defer t
+    :init
+    (require 'emacsql)
+    (require 'emacsql-sqlite)
+    (defvar tietokanta-polku "/Users/tommi/Tietokannat/")
+    (defun tietokanta-yhteys (filu) (emacsql-sqlite (concat tietokanta-polku filu)))
+    (setq db-formula1 (tietokanta-yhteys "formula1.db"))
+    (setq db-jargon (tietokanta-yhteys "jargon.db"))
+    )
   )
 
 (use-package md4rd :ensure t

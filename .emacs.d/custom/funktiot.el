@@ -420,8 +420,29 @@ mielivaltaisesta paikasta toiseen."
 sijoitetaan putkeen, jossa se käy useiden funktioiden FUNCS läpi. Funktioiden
 tulee olla sellaisia, että ne ottavat vastaan yhden argumentin (eli monen muuttujan
 funktioita ei voi olla); sulkeumat ovat sallittuja, samoin lambdat; nimettyjen
-funktioiden eteen on pakko laittaa '-merkki, jotta putki luetaan oikein."
+funktioiden eteen on pakko laittaa '-merkki, jotta putki luetaan oikein.
+
+Bugeja: Ei voi käyttää funktioiden sisällä s.e. input on muuttuja, joka syötetään
+itsessään funktioon."
   (eval `(cons 'thread-last (cons ,init (quote ,(mapcar 'add-funcall-to-front funcs))))))
+
+(defun eval-last-sexp-and-replace-it-by-result ()
+  "Replace sexp before point by result of its evaluation."
+  (interactive)
+  (let ((result  (pp-to-string (eval (pp-last-sexp) lexical-binding))))
+    (delete-region (save-excursion (backward-sexp) (point)) (point))
+    (insert result)))
+
+(defun select-jargon (lyh)
+  "Hae lyhenteelle selitys jargon.db-tietokannasta."
+  (interactive "sAnna lyhenne: ")
+  (->> (concat "%" (upcase lyh) "%")
+       (emacsql db-jargon [:select
+			       merkitys
+			       :from quote_lyhenteet
+			       :where (like termi $r1)])
+       (mapcar 'first)
+       (mapc 'print)))
 
 
 ;; The File Ends Here ends
