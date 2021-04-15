@@ -1,9 +1,0 @@
-# -*- mode: snippet -*-
-# name: Funktio
-# key: def
-# --
-def ${1:func}($2):
-    """
-    ${3:Funktion kuvaus}
-    """
-    $0

@@ -1,5 +1,0 @@
-# -*- mode: snippet -*-
-# name: Lähdeviite
-# key: ref
-# --
-[[cite:$1]]$0

@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: Alias
-# key: al
-# --
-(defalias '$1 '$2)
-$0

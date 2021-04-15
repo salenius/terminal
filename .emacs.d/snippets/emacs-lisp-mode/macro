@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: Macro
-# key: macro
-# --
-(defmacro $1 ($2)
-`($0))

@@ -1,5 +1,0 @@
-# -*- mode: snippet -*-
-# name: Yhtälöviite
-# key: ref
-# --
-(\ref{$1})$0

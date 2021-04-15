@@ -1,5 +1,0 @@
-# -*- mode: snippet -*-
-# name: Matriisi
-# key: matr
-# --
-matrix(c($1), nrow=$2, ncol=$3, byrow=${TRUE})

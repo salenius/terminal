@@ -1,9 +1,0 @@
-# -*- mode: snippet -*-
-# name: Elisp-koodi
-# key: elisp
-# --
-#+BEGIN_SRC emacs-lisp :lexical t
-
-$0
-
-#+END_SRC 

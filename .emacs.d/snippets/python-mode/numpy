@@ -1,7 +1,0 @@
-# -*- mode: snippet -*-
-# name: Numpy
-# key: np
-# --
-import numpy as np
-import numpy.linalg as npl
-$0

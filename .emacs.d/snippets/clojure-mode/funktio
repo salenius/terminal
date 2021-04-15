@@ -1,9 +1,0 @@
-# -*- mode: snippet -*-
-# name: Funktio
-# key: defun
-# --
-(defn $1
- ${4:"Kommentti"}
- [$3]
- ($2))
- $0

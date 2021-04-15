@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: Uusi abbrev-lyhenne
-# key: abb
-# --
-("$1" "$2" nil 0)
-$0
